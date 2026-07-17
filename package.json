@@ -1,0 +1,26 @@
+{
+  "name": "mentelab",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Plataforma de medición y entrenamiento de habilidades cognitivas para instituciones educativas",
+  "engines": {
+    "node": ">=20"
+  },
+  "packageManager": "pnpm@11.13.0",
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "typecheck": "turbo typecheck",
+    "lint": "turbo lint",
+    "test": "turbo test",
+    "db:migrate": "pnpm --filter @mentelab/db migrate:dev",
+    "db:seed": "pnpm --filter @mentelab/db seed",
+    "db:studio": "pnpm --filter @mentelab/db studio",
+    "format": "prettier --write \"**/*.{ts,tsx,md,json,css}\""
+  },
+  "devDependencies": {
+    "prettier": "^3.5.3",
+    "turbo": "^2.5.0",
+    "typescript": "^5.8.3"
+  }
+}

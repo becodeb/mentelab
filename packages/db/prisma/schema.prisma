@@ -1,0 +1,442 @@
+// MenteLab — esquema completo (doc 03).
+// Reglas de oro: attempts y attempt_events son APPEND-ONLY (nunca UPDATE/DELETE
+// de datos históricos); desactivar = flag; mover de curso = nueva Enrollment.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────── Enums ───────────────────────────
+
+enum PlayerType {
+  STUDENT
+  GUEST
+}
+
+enum StaffRole {
+  TEACHER
+  INSTITUTION_ADMIN
+  SUPER_ADMIN
+}
+
+enum Gender {
+  F
+  M
+  X
+}
+
+enum SecretType {
+  PIN4
+  PICTURE
+}
+
+enum AttemptStatus {
+  IN_PROGRESS
+  COMPLETED
+  ABANDONED
+  INVALID
+}
+
+enum DataScope {
+  INSTITUTIONAL
+  GLOBAL
+}
+
+// ─────────────────── Identidad y organización ────────────────
+
+model Institution {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String
+  slug      String   @unique
+  /// settings: { genderEnabled, studentRankingsVisible, fullLeaderboardForStudents, guestMigrationAllowed }
+  settings  Json     @default("{}")
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  schoolYears SchoolYear[]
+  grades      Grade[]
+  classrooms  Classroom[]
+  staff       StaffUser[]
+  students    StudentProfile[]
+
+  @@map("institutions")
+}
+
+model SchoolYear {
+  id            String   @id @default(uuid()) @db.Uuid
+  institutionId String   @db.Uuid
+  name          String // "2026"
+  startsAt      DateTime
+  endsAt        DateTime
+  active        Boolean  @default(true)
+
+  institution Institution @relation(fields: [institutionId], references: [id])
+  classrooms  Classroom[]
+
+  @@unique([institutionId, name])
+  @@map("school_years")
+}
+
+model Grade {
+  id            String @id @default(uuid()) @db.Uuid
+  institutionId String @db.Uuid
+  name          String // "1er Grado"
+  level         Int // 1..12: orden y comparación entre años
+  typicalAge    Int // 6 → rankings por edad
+
+  institution Institution @relation(fields: [institutionId], references: [id])
+  classrooms  Classroom[]
+
+  @@unique([institutionId, level])
+  @@map("grades")
+}
+
+model Classroom {
+  id            String  @id @default(uuid()) @db.Uuid
+  institutionId String  @db.Uuid
+  schoolYearId  String  @db.Uuid
+  gradeId       String  @db.Uuid
+  division      String // "A"
+  classCode     String  @unique // "SOL-42": login rápido / QR
+  active        Boolean @default(true)
+
+  institution Institution        @relation(fields: [institutionId], references: [id])
+  schoolYear  SchoolYear         @relation(fields: [schoolYearId], references: [id])
+  grade       Grade              @relation(fields: [gradeId], references: [id])
+  students    StudentProfile[]
+  enrollments Enrollment[]
+  teachers    TeacherClassroom[]
+
+  @@unique([institutionId, schoolYearId, gradeId, division])
+  @@map("classrooms")
+}
+
+model StaffUser {
+  id            String    @id @default(uuid()) @db.Uuid
+  institutionId String?   @db.Uuid // null → SUPER_ADMIN
+  role          StaffRole
+  name          String
+  email         String    @unique
+  passwordHash  String
+  active        Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+
+  institution Institution?       @relation(fields: [institutionId], references: [id])
+  classrooms  TeacherClassroom[]
+  auditLogs   AuditLog[]
+
+  @@map("staff_users")
+}
+
+model TeacherClassroom {
+  staffUserId String @db.Uuid
+  classroomId String @db.Uuid
+
+  staffUser StaffUser @relation(fields: [staffUserId], references: [id])
+  classroom Classroom @relation(fields: [classroomId], references: [id])
+
+  @@id([staffUserId, classroomId])
+  @@map("teacher_classrooms")
+}
+
+// ──────────────── Jugadores (alumnos + invitados) ────────────
+
+model Player {
+  id          String     @id @default(uuid()) @db.Uuid
+  type        PlayerType
+  displayName String // "Juli P." / alias invitado
+  avatarId    String     @default("fox")
+  birthYear   Int?
+  gender      Gender?
+  active      Boolean    @default(true)
+  createdAt   DateTime   @default(now())
+
+  studentProfile StudentProfile?
+  guestProfile   GuestProfile?
+  progress       PlayerProgress?
+  enrollments    Enrollment[]
+  attempts       Attempt[]
+  sessions       PlaySession[]
+  stats          PlayerBenchmarkStats[]
+  personalBests  PersonalBest[]
+  xpTransactions XpTransaction[]
+  badges         PlayerBadge[]
+  missions       PlayerMission[]
+  cognitive      CognitiveScore[]
+
+  @@map("players")
+}
+
+model StudentProfile {
+  playerId      String     @id @db.Uuid
+  institutionId String     @db.Uuid
+  classroomId   String     @db.Uuid // curso ACTUAL (desnormalizado)
+  firstName     String
+  lastName      String
+  secretType    SecretType @default(PIN4)
+  secretHash    String
+
+  player      Player      @relation(fields: [playerId], references: [id])
+  institution Institution @relation(fields: [institutionId], references: [id])
+  classroom   Classroom   @relation(fields: [classroomId], references: [id])
+
+  @@index([institutionId])
+  @@index([classroomId])
+  @@map("student_profiles")
+}
+
+/// Historial de matriculación: mover de curso cierra la fila vigente y abre otra.
+model Enrollment {
+  id          String    @id @default(uuid()) @db.Uuid
+  playerId    String    @db.Uuid
+  classroomId String    @db.Uuid
+  fromDate    DateTime  @default(now())
+  toDate      DateTime? // null = vigente
+
+  player    Player    @relation(fields: [playerId], references: [id])
+  classroom Classroom @relation(fields: [classroomId], references: [id])
+
+  @@index([playerId])
+  @@index([classroomId])
+  @@map("enrollments")
+}
+
+model GuestProfile {
+  playerId     String  @id @db.Uuid
+  deviceUuid   String  @unique
+  alias        String? // solo si quiere ranking global (opt-in)
+  migratedToId String? @db.Uuid
+
+  player Player @relation(fields: [playerId], references: [id])
+
+  @@map("guest_profiles")
+}
+
+// ───────────────── Intentos y eventos (corazón) ──────────────
+
+/// NOTA producción: scripts/partitioning.sql convierte esta tabla (y
+/// attempt_events) a particionadas por RANGE(startedAt) mensual.
+model Attempt {
+  id             String        @id @default(uuid()) @db.Uuid
+  playerId       String        @db.Uuid
+  benchmarkSlug  String
+  // Contexto desnormalizado AL MOMENTO DE JUGAR (histórico correcto):
+  institutionId  String?       @db.Uuid // null = Modo Libre
+  classroomId    String?       @db.Uuid
+  gradeLevel     Int?
+  playerAge      Int?
+  scope          DataScope
+  // Ciclo de vida:
+  status         AttemptStatus @default(IN_PROGRESS)
+  startedAt      DateTime      @default(now())
+  endedAt        DateTime?
+  durationMs     Int?
+  // Resultado canónico:
+  score          Float?
+  scoreNormalized Float?
+  levelReached   Int?
+  errorCount     Int?
+  successCount   Int?
+  /// Métricas específicas del benchmark (validadas por su metricsSchema).
+  metrics        Json?
+  /// Configuración de dificultad usada.
+  config         Json
+  // Calidad del dato:
+  focusLostCount Int           @default(0)
+  pauseCount     Int           @default(0)
+  avgFps         Float?
+  device         Json?
+  sessionId      String?       @db.Uuid
+  appVersion     String?
+  /// Motivo si status=INVALID (heurística anti-cheat).
+  invalidReason  String?
+
+  player  Player          @relation(fields: [playerId], references: [id])
+  session PlaySession?    @relation(fields: [sessionId], references: [id])
+  events  AttemptEvent[]
+
+  @@index([playerId, benchmarkSlug, startedAt(sort: Desc)])
+  @@index([institutionId, benchmarkSlug, startedAt(sort: Desc)])
+  @@index([classroomId, benchmarkSlug, startedAt(sort: Desc)])
+  @@index([scope, benchmarkSlug, startedAt(sort: Desc)])
+  @@map("attempts")
+}
+
+/// APPEND-ONLY. Índice mínimo: barata de escribir, se lee solo en drill-down.
+model AttemptEvent {
+  attemptId String @db.Uuid
+  seq       Int
+  /// ms desde game_start (performance.now del cliente, alta resolución).
+  tMs       Float
+  type      String
+  payload   Json?
+
+  attempt Attempt @relation(fields: [attemptId], references: [id])
+
+  @@id([attemptId, seq])
+  @@map("attempt_events")
+}
+
+/// Una "sentada" de juego: agrupa intentos seguidos del mismo dispositivo.
+model PlaySession {
+  id        String    @id @default(uuid()) @db.Uuid
+  playerId  String    @db.Uuid
+  startedAt DateTime  @default(now())
+  endedAt   DateTime?
+  device    Json?
+
+  player   Player    @relation(fields: [playerId], references: [id])
+  attempts Attempt[]
+
+  @@index([playerId, startedAt(sort: Desc)])
+  @@map("play_sessions")
+}
+
+// ─────────────────────── Agregados ───────────────────────────
+
+/// Agregado caliente por (jugador, benchmark). Derivado: reconstruible.
+model PlayerBenchmarkStats {
+  playerId       String    @db.Uuid
+  benchmarkSlug  String
+  totalAttempts  Int       @default(0)
+  totalPlayMs    Float     @default(0)
+  bestScore      Float?
+  bestAt         DateTime?
+  avgAllTime     Float?
+  avg30d         Float?
+  consistency30d Float?
+  /// % de mejora en 30 días (positivo = mejoró), por regresión.
+  improvement30dPct Float?
+  lastPlayedAt   DateTime?
+
+  player Player @relation(fields: [playerId], references: [id])
+
+  @@id([playerId, benchmarkSlug])
+  @@map("player_benchmark_stats")
+}
+
+/// Histórico de récords: una fila CADA VEZ que rompe uno (nunca se pisa).
+model PersonalBest {
+  id            String   @id @default(uuid()) @db.Uuid
+  playerId      String   @db.Uuid
+  benchmarkSlug String
+  metric        String   @default("score")
+  value         Float
+  attemptId     String   @db.Uuid
+  achievedAt    DateTime @default(now())
+
+  player Player @relation(fields: [playerId], references: [id])
+
+  @@index([playerId, benchmarkSlug, achievedAt(sort: Desc)])
+  @@map("personal_bests")
+}
+
+// ─────────────────────── Gamificación ────────────────────────
+
+model PlayerProgress {
+  playerId       String    @id @db.Uuid
+  xp             Int       @default(0)
+  level          Int       @default(1)
+  currentStreak  Int       @default(0)
+  longestStreak  Int       @default(0)
+  /// Día (fecha local del server) de la última partida, para rachas.
+  lastPlayedDate DateTime? @db.Date
+  /// Días de gracia de racha usados esta semana (protector de racha).
+  graceUsedOn    DateTime? @db.Date
+  totalAttempts  Int       @default(0)
+  totalPlayMs    Float     @default(0)
+
+  player Player @relation(fields: [playerId], references: [id])
+
+  @@map("player_progress")
+}
+
+/// Ledger append-only de XP: auditable y re-computable.
+model XpTransaction {
+  id        String   @id @default(uuid()) @db.Uuid
+  playerId  String   @db.Uuid
+  amount    Int
+  reason    String
+  refId     String?
+  createdAt DateTime @default(now())
+
+  player Player @relation(fields: [playerId], references: [id])
+
+  @@index([playerId, createdAt(sort: Desc)])
+  @@map("xp_transactions")
+}
+
+model PlayerBadge {
+  playerId  String   @db.Uuid
+  badgeCode String
+  earnedAt  DateTime @default(now())
+  refId     String?
+
+  player Player @relation(fields: [playerId], references: [id])
+
+  @@id([playerId, badgeCode])
+  @@map("player_badges")
+}
+
+model PlayerMission {
+  id          String    @id @default(uuid()) @db.Uuid
+  playerId    String    @db.Uuid
+  missionCode String
+  date        DateTime  @db.Date
+  progress    Int       @default(0)
+  target      Int
+  xpReward    Int
+  completedAt DateTime?
+
+  player Player @relation(fields: [playerId], references: [id])
+
+  @@unique([playerId, missionCode, date])
+  @@index([playerId, date])
+  @@map("player_missions")
+}
+
+/// Perfil cognitivo: serie temporal semanal por indicador (doc 05 §4).
+model CognitiveScore {
+  playerId   String   @db.Uuid
+  indicator  String
+  value      Float
+  sampleSize Int
+  windowEnd  DateTime @db.Date
+
+  player Player @relation(fields: [playerId], references: [id])
+
+  @@id([playerId, indicator, windowEnd])
+  @@map("cognitive_scores")
+}
+
+// ──────────────────── Rankings y auditoría ───────────────────
+
+/// Foto diaria de rankings para "posición histórica".
+model LeaderboardSnapshot {
+  id       String   @id @default(uuid()) @db.Uuid
+  scopeKey String // "classroom:<id>:reaction-time:best"
+  date     DateTime @db.Date
+  rankings Json
+
+  @@unique([scopeKey, date])
+  @@map("leaderboard_snapshots")
+}
+
+/// Acciones de staff (altas, bajas, exports) — append-only.
+model AuditLog {
+  id        String   @id @default(uuid()) @db.Uuid
+  staffId   String   @db.Uuid
+  action    String
+  details   Json?
+  createdAt DateTime @default(now())
+
+  staff StaffUser @relation(fields: [staffId], references: [id])
+
+  @@index([staffId, createdAt(sort: Desc)])
+  @@map("audit_logs")
+}

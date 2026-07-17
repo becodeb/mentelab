@@ -1,0 +1,41 @@
+{
+  "name": "@mentelab/web",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Frontend de MenteLab (Next.js)",
+  "scripts": {
+    "dev": "next dev -p 3000",
+    "build": "next build",
+    "start": "next start -p 3000",
+    "typecheck": "tsc --noEmit",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@mentelab/benchmarks": "workspace:*",
+    "@mentelab/shared": "workspace:*",
+    "@hookform/resolvers": "^5.0.1",
+    "@tanstack/react-query": "^5.75.0",
+    "canvas-confetti": "^1.9.3",
+    "clsx": "^2.1.1",
+    "framer-motion": "^12.9.0",
+    "lucide-react": "^0.507.0",
+    "next": "^15.3.2",
+    "qrcode.react": "^4.2.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "react-hook-form": "^7.56.0",
+    "recharts": "^2.15.3",
+    "tailwind-merge": "^3.2.0",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@mentelab/config": "workspace:*",
+    "@tailwindcss/postcss": "^4.1.5",
+    "@types/canvas-confetti": "^1.9.0",
+    "@types/node": "^22.15.0",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.0",
+    "tailwindcss": "^4.1.5",
+    "typescript": "^5.8.3"
+  }
+}

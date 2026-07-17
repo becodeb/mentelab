@@ -1,0 +1,54 @@
+@import "tailwindcss";
+
+/* ── Design tokens MenteLab (doc 09 §3) ─────────────────────────── */
+@theme {
+  --font-display: var(--font-nunito), ui-rounded, system-ui, sans-serif;
+
+  /* Primaria cálida (índigo/violeta) */
+  --color-brand-50: #eef2ff;
+  --color-brand-100: #e0e7ff;
+  --color-brand-200: #c7d2fe;
+  --color-brand-300: #a5b4fc;
+  --color-brand-400: #818cf8;
+  --color-brand-500: #6366f1;
+  --color-brand-600: #4f46e5;
+  --color-brand-700: #4338ca;
+  --color-brand-800: #3730a3;
+  --color-brand-900: #312e81;
+
+  /* Acentos por categoría de juego */
+  --color-speed: #f59e0b;
+  --color-memory: #3b82f6;
+  --color-attention: #10b981;
+  --color-precision: #ec4899;
+  --color-typing: #06b6d4;
+
+  --radius-kid: 1.25rem;
+}
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  font-family: var(--font-display);
+  @apply bg-slate-50 text-slate-900 antialiased;
+  /* Elimina el delay de doble-tap: crítico para medir reacción en táctil */
+  touch-action: manipulation;
+}
+
+/* Targets táctiles grandes por defecto en zona alumno */
+.kid-zone button,
+.kid-zone a {
+  min-height: 48px;
+}
+
+/* Respeto por prefers-reduced-motion (doc 04 §7) */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

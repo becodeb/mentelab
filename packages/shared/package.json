@@ -1,0 +1,20 @@
+{
+  "name": "@mentelab/shared",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Tipos, enums y schemas Zod compartidos entre API y frontend",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@mentelab/config": "workspace:*",
+    "typescript": "^5.8.3"
+  }
+}

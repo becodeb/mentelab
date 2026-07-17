@@ -1,0 +1,32 @@
+{
+  "name": "@mentelab/db",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Schema Prisma, cliente y seed de MenteLab",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "generate": "prisma generate",
+    "migrate:dev": "prisma migrate dev",
+    "migrate:deploy": "prisma migrate deploy",
+    "studio": "prisma studio",
+    "seed": "tsx prisma/seed.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@mentelab/benchmarks": "workspace:*",
+    "@mentelab/shared": "workspace:*",
+    "@prisma/client": "^6.7.0",
+    "bcryptjs": "^2.4.3"
+  },
+  "devDependencies": {
+    "@mentelab/config": "workspace:*",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/node": "^22.15.0",
+    "prisma": "^6.7.0",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.3"
+  }
+}
