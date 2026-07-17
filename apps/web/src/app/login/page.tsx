@@ -44,7 +44,7 @@ export default function StudentLoginPage() {
   // ── Paso 1: código de clase ────────────────────────────────────────
   if (!classCode || (lookup.isError && !lookup.isFetching)) {
     return (
-      <main className="kid-zone flex min-h-dvh items-center justify-center bg-gradient-to-b from-brand-50 to-white p-6">
+      <main className="kid-zone flex min-h-dvh items-center justify-center bg-gradient-to-b from-brand-50 to-cream-50 p-6">
         <Card className="w-full max-w-md text-center">
           <p className="text-6xl">🏫</p>
           <h1 className="mt-2 text-2xl font-black text-slate-800">¿Cuál es tu clase?</h1>
@@ -87,7 +87,7 @@ export default function StudentLoginPage() {
   // ── Paso 3: clave simple ───────────────────────────────────────────
   if (selected) {
     return (
-      <main className="kid-zone flex min-h-dvh items-center justify-center bg-gradient-to-b from-brand-50 to-white p-6">
+      <main className="kid-zone flex min-h-dvh items-center justify-center bg-gradient-to-b from-brand-50 to-cream-50 p-6">
         <Card className="w-full max-w-md text-center">
           <p className="text-6xl">{avatarEmoji(selected.avatarId)}</p>
           <h1 className="mt-2 text-2xl font-black text-slate-800">¡Hola {selected.displayName}!</h1>
@@ -120,7 +120,7 @@ export default function StudentLoginPage() {
 
   // ── Paso 2: grilla de nombres ──────────────────────────────────────
   return (
-    <main className="kid-zone min-h-dvh bg-gradient-to-b from-brand-50 to-white p-6">
+    <main className="kid-zone min-h-dvh bg-gradient-to-b from-brand-50 to-cream-50 p-6">
       <div className="mx-auto max-w-2xl">
         <header className="text-center">
           <p className="font-black text-brand-600">
@@ -136,7 +136,7 @@ export default function StudentLoginPage() {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: i * 0.03 }}
               onClick={() => setSelected(s)}
-              className="rounded-3xl border-2 border-slate-100 bg-white p-4 text-center shadow-sm transition-all hover:border-brand-400 hover:shadow-md active:scale-95"
+              className="rounded-3xl border-2 border-slate-100 bg-[#fffdf6] p-4 text-center shadow-sm transition-all hover:border-brand-400 hover:shadow-md active:scale-95"
             >
               <p className="text-4xl">{avatarEmoji(s.avatarId)}</p>
               <p className="mt-1 truncate text-sm font-black text-slate-700">{s.displayName}</p>

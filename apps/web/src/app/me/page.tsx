@@ -211,17 +211,17 @@ function StatsDetail({ stats, slug }: { stats: BenchmarkStats; slug: string }) {
             <Line
               type="monotone"
               dataKey="score"
-              stroke="#6366f1"
+              stroke="#d96c47"
               strokeWidth={3}
-              dot={{ r: 3, fill: "#6366f1" }}
+              dot={{ r: 3, fill: "#d96c47" }}
             />
             {record && (
               <ReferenceDot
                 x={record.label}
                 y={record.score}
                 r={8}
-                fill="#f59e0b"
-                stroke="#fff"
+                fill="#e8a33d"
+                stroke="#fffdf6"
                 strokeWidth={2}
               />
             )}

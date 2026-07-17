@@ -58,11 +58,11 @@ export function TypingTestGame({ config, emit, now, finish }: GameProps) {
 
   return (
     <div
-      className="flex min-h-dvh select-none flex-col items-center justify-center bg-gradient-to-b from-cyan-50 to-white p-6"
+      className="flex min-h-dvh select-none flex-col items-center justify-center bg-gradient-to-b from-cyan-50 to-cream-50 p-6"
       onClick={() => inputRef.current?.focus()}
     >
       <p className="text-4xl font-black text-cyan-600">{secondsLeft}s</p>
-      <div className="mt-6 max-w-2xl rounded-3xl bg-white p-6 text-2xl leading-relaxed shadow-sm">
+      <div className="mt-6 max-w-2xl rounded-3xl bg-[#fffdf6] p-6 text-2xl leading-relaxed shadow-sm">
         {text.split("").map((ch, i) => {
           const t = typed[i];
           const isCursor = i === typed.length;

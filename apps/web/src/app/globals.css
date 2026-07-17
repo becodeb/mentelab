@@ -1,29 +1,126 @@
 @import "tailwindcss";
 
-/* ── Design tokens MenteLab (doc 09 §3) ─────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════════
+   MenteLab — Design System v2 "Crema & Tinta"
+   Minimalismo editorial cálido: crema de fondo, tinta caliente para
+   texto, terracota de acento y pasteles empolvados por categoría.
+   Las escalas slate/brand/blue/etc. se REDEFINEN aquí para que toda
+   la app herede la nueva piel sin tocar cada componente.
+   ═══════════════════════════════════════════════════════════════════ */
 @theme {
-  --font-display: var(--font-nunito), ui-rounded, system-ui, sans-serif;
+  --font-display: var(--font-bricolage), ui-rounded, system-ui, sans-serif;
+  --font-body: var(--font-figtree), system-ui, sans-serif;
 
-  /* Primaria cálida (índigo/violeta) */
-  --color-brand-50: #eef2ff;
-  --color-brand-100: #e0e7ff;
-  --color-brand-200: #c7d2fe;
-  --color-brand-300: #a5b4fc;
-  --color-brand-400: #818cf8;
-  --color-brand-500: #6366f1;
-  --color-brand-600: #4f46e5;
-  --color-brand-700: #4338ca;
-  --color-brand-800: #3730a3;
-  --color-brand-900: #312e81;
+  /* ── Crema (superficie) y Tinta (texto) ── */
+  --color-cream-50: #faf6ec;
+  --color-cream-100: #f3ecdc;
+  --color-cream-200: #eadfc7;
+  --color-cream-300: #dccca9;
+  --color-ink-300: #c6b896;
+  --color-ink-400: #9d8f73;
+  --color-ink-500: #7a6d54;
+  --color-ink-700: #3e362a;
+  --color-ink-900: #201b12;
 
-  /* Acentos por categoría de juego */
-  --color-speed: #f59e0b;
-  --color-memory: #3b82f6;
-  --color-attention: #10b981;
-  --color-precision: #ec4899;
-  --color-typing: #06b6d4;
+  /* slate = neutro cálido (re-mapea todo el gris frío existente) */
+  --color-slate-50: #faf6ec;
+  --color-slate-100: #f3ecdc;
+  --color-slate-200: #eadfc7;
+  --color-slate-300: #c6b896;
+  --color-slate-400: #9d8f73;
+  --color-slate-500: #7a6d54;
+  --color-slate-600: #5c5140;
+  --color-slate-700: #3e362a;
+  --color-slate-800: #2a2418;
+  --color-slate-900: #201b12;
 
-  --radius-kid: 1.25rem;
+  /* brand = terracota (acento principal, links, momentos) */
+  --color-brand-50: #fbefe6;
+  --color-brand-100: #f7ddc9;
+  --color-brand-200: #efc3a3;
+  --color-brand-300: #e7a37a;
+  --color-brand-400: #de8355;
+  --color-brand-500: #d96c47;
+  --color-brand-600: #c65230;
+  --color-brand-700: #a44226;
+  --color-brand-800: #82351f;
+  --color-brand-900: #672b1a;
+
+  /* Pasteles empolvados por categoría de juego */
+  --color-blue-50: #eff2fa;
+  --color-blue-100: #e2e8f5;
+  --color-blue-200: #cdd8ee;
+  --color-blue-300: #aebfe3;
+  --color-blue-400: #93aad9;
+  --color-blue-500: #7c97d8;
+  --color-blue-600: #5f7cc6;
+
+  --color-emerald-50: #f2f5ea;
+  --color-emerald-100: #e7eeda;
+  --color-emerald-200: #d5e2bf;
+  --color-emerald-300: #bcd3a4;
+  --color-emerald-400: #a3c48b;
+  --color-emerald-500: #8cb573;
+  --color-emerald-600: #719c58;
+
+  --color-pink-50: #f9f0f2;
+  --color-pink-100: #f4e1e7;
+  --color-pink-200: #ecc9d4;
+  --color-pink-300: #e3aebf;
+  --color-pink-400: #dc9ab0;
+  --color-pink-500: #d5849f;
+  --color-pink-600: #bd6684;
+
+  --color-cyan-50: #edf5f3;
+  --color-cyan-100: #dcedea;
+  --color-cyan-200: #bfdfd9;
+  --color-cyan-300: #9ccfc6;
+  --color-cyan-400: #7cc2b6;
+  --color-cyan-500: #64b8ac;
+  --color-cyan-600: #4a9c8f;
+
+  --color-amber-50: #faf3e3;
+  --color-amber-100: #f6e8c8;
+  --color-amber-200: #efd69d;
+  --color-amber-300: #e9c375;
+  --color-amber-400: #edbb55;
+  --color-amber-500: #e8a33d;
+  --color-amber-600: #cd8526;
+  --color-amber-700: #a86a1e;
+
+  --color-rose-50: #fbeeea;
+  --color-rose-100: #f8dcd3;
+  --color-rose-200: #f2bda9;
+  --color-rose-300: #ec9c80;
+  --color-rose-400: #e97a5b;
+  --color-rose-500: #e4573d;
+  --color-rose-600: #cb4429;
+
+  --color-orange-500: #e07a3f;
+  --color-orange-600: #c66327;
+
+  --color-violet-50: #f3eff8;
+  --color-violet-600: #7d6aa8;
+
+  --radius-kid: 1.5rem;
+
+  --animate-float: float 7s ease-in-out infinite;
+  --animate-float-slow: float 11s ease-in-out infinite;
+  --animate-marquee: marquee 30s linear infinite;
+  --animate-wiggle: wiggle 2.4s ease-in-out infinite;
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0) rotate(-3deg); }
+    50% { transform: translateY(-18px) rotate(4deg); }
+  }
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+  @keyframes wiggle {
+    0%, 100% { transform: rotate(-4deg); }
+    50% { transform: rotate(5deg); }
+  }
 }
 
 :root {
@@ -31,23 +128,49 @@
 }
 
 body {
-  font-family: var(--font-display);
-  @apply bg-slate-50 text-slate-900 antialiased;
-  /* Elimina el delay de doble-tap: crítico para medir reacción en táctil */
+  font-family: var(--font-body);
+  background-color: var(--color-cream-50);
+  color: var(--color-ink-900);
+  -webkit-font-smoothing: antialiased;
+  /* Sin delay de doble-tap: crítico para medir reacción en táctil */
   touch-action: manipulation;
 }
 
-/* Targets táctiles grandes por defecto en zona alumno */
+/* Titulares siempre en la display face — toda la app hereda el carácter */
+h1, h2, h3, .font-display {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+}
+
+::selection {
+  background: var(--color-brand-500);
+  color: var(--color-cream-50);
+}
+
+/* Grano sutil: textura de papel sobre todo (profundidad sin ruido visual) */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  pointer-events: none;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Targets táctiles grandes en la zona alumno */
 .kid-zone button,
 .kid-zone a {
   min-height: 48px;
 }
 
-/* Respeto por prefers-reduced-motion (doc 04 §7) */
+/* Cinta marquee (landing) */
+.marquee-track {
+  animation: var(--animate-marquee);
+}
+
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
+  *, *::before, *::after {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }

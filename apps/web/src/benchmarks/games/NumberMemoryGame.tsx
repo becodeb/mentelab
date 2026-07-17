@@ -66,7 +66,7 @@ export function NumberMemoryGame({ config, emit, now, finish }: GameProps) {
   };
 
   return (
-    <div className="flex min-h-dvh select-none flex-col items-center justify-center bg-gradient-to-b from-blue-50 to-white p-6">
+    <div className="flex min-h-dvh select-none flex-col items-center justify-center bg-gradient-to-b from-blue-50 to-cream-50 p-6">
       <p className="text-sm font-black uppercase tracking-widest text-blue-300">
         {digits} dígito{digits > 1 ? "s" : ""}
       </p>

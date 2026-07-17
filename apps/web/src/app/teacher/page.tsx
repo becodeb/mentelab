@@ -149,7 +149,7 @@ export default function TeacherDashboard() {
                     <XAxis dataKey="range" tick={{ fontSize: 11 }} tickLine={false} />
                     <YAxis tick={{ fontSize: 11 }} tickLine={false} allowDecimals={false} />
                     <Tooltip formatter={(v: number) => [v, "Partidas"]} />
-                    <Bar dataKey="count" fill="#6366f1" radius={[6, 6, 0, 0]} />
+                    <Bar dataKey="count" fill="#d96c47" radius={[6, 6, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
@@ -184,11 +184,11 @@ export default function TeacherDashboard() {
                     domain={["auto", "auto"]}
                   />
                   <Tooltip />
-                  <Area dataKey="p75" stroke="none" fill="#c7d2fe" fillOpacity={0.6} />
-                  <Area dataKey="p25" stroke="none" fill="#ffffff" fillOpacity={1} />
+                  <Area dataKey="p75" stroke="none" fill="#f7ddc9" fillOpacity={0.6} />
+                  <Area dataKey="p25" stroke="none" fill="#fffdf6" fillOpacity={1} />
                   <Area
                     dataKey="mean"
-                    stroke="#4f46e5"
+                    stroke="#c65230"
                     strokeWidth={3}
                     fill="none"
                     type="monotone"
@@ -250,7 +250,7 @@ function HeatmapGrid({ cells }: { cells: { dow: number; hour: number; count: num
                   className="aspect-square min-w-5 rounded"
                   style={{
                     backgroundColor:
-                      count === 0 ? "#f1f5f9" : `rgba(99, 102, 241, ${0.25 + intensity * 0.75})`,
+                      count === 0 ? "#f3ecdc" : `rgba(217, 108, 71, ${0.25 + intensity * 0.75})`,
                   }}
                 />
               );

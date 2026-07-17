@@ -87,7 +87,7 @@ export function VisualMemoryGame({ config, emit, now, finish }: GameProps) {
   };
 
   return (
-    <div className="flex min-h-dvh select-none flex-col items-center justify-center bg-gradient-to-b from-emerald-50 to-white p-6">
+    <div className="flex min-h-dvh select-none flex-col items-center justify-center bg-gradient-to-b from-emerald-50 to-cream-50 p-6">
       <div className="flex gap-6 text-sm font-black uppercase tracking-widest text-emerald-300">
         <span>nivel {level}</span>
         <span>{"❤️".repeat(Math.max(0, lives))}</span>

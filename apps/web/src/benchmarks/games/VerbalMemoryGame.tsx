@@ -65,7 +65,7 @@ export function VerbalMemoryGame({ config, emit, now, finish }: GameProps) {
   };
 
   return (
-    <div className="flex min-h-dvh select-none flex-col items-center justify-center bg-gradient-to-b from-blue-50 to-white p-6">
+    <div className="flex min-h-dvh select-none flex-col items-center justify-center bg-gradient-to-b from-blue-50 to-cream-50 p-6">
       <div className="flex gap-6 text-sm font-black uppercase tracking-widest text-blue-300">
         <span>✅ {score}</span>
         <span>{"❤️".repeat(Math.max(0, lives))}</span>

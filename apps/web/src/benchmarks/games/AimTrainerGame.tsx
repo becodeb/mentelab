@@ -64,7 +64,7 @@ export function AimTrainerGame({ config, emit, now, finish }: GameProps) {
     <div
       ref={areaRef}
       onPointerDown={handleMiss}
-      className="relative min-h-dvh w-full select-none overflow-hidden bg-gradient-to-b from-pink-50 to-white"
+      className="relative min-h-dvh w-full select-none overflow-hidden bg-gradient-to-b from-pink-50 to-cream-50"
     >
       <p className="pointer-events-none absolute left-1/2 top-4 -translate-x-1/2 text-sm font-black uppercase tracking-widest text-pink-300">
         {hits}/{cfg.targets} blancos
@@ -82,7 +82,7 @@ export function AimTrainerGame({ config, emit, now, finish }: GameProps) {
             transform: "translate(-50%, -50%)",
           }}
         >
-          <span className="rounded-full bg-white" style={{ width: cfg.targetSizePx * 0.4, height: cfg.targetSizePx * 0.4 }} />
+          <span className="rounded-full bg-[#fffdf6]" style={{ width: cfg.targetSizePx * 0.4, height: cfg.targetSizePx * 0.4 }} />
         </button>
       )}
     </div>

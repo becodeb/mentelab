@@ -67,7 +67,7 @@ export default function ClassSessionPage() {
           {/* QR proyectable */}
           <Card className="text-center">
             <h2 className="text-xl font-black text-slate-700">Escaneá para entrar 📱</h2>
-            <div className="mx-auto mt-4 w-fit rounded-3xl bg-white p-6 shadow-inner ring-4 ring-brand-100">
+            <div className="mx-auto mt-4 w-fit rounded-3xl bg-[#fffdf6] p-6 shadow-inner ring-4 ring-brand-100">
               <QRCodeSVG value={session.qrPayload} size={280} />
             </div>
             <p className="mt-4 text-sm font-bold text-slate-400">o escribí el código:</p>

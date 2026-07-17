@@ -84,7 +84,7 @@ export default function ComparePage() {
                   <XAxis dataKey="label" tick={{ fontSize: 11 }} tickLine={false} />
                   <YAxis tick={{ fontSize: 11 }} tickLine={false} domain={["auto", "auto"]} />
                   <Tooltip />
-                  <Bar dataKey="mean" fill="#6366f1" radius={[6, 6, 0, 0]} name="Promedio" />
+                  <Bar dataKey="mean" fill="#d96c47" radius={[6, 6, 0, 0]} name="Promedio" />
                 </BarChart>
               </ResponsiveContainer>
             </div>

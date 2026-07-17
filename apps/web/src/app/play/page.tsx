@@ -2,23 +2,24 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 import { serializeCatalog } from "@mentelab/benchmarks";
 import { avatarEmoji } from "@mentelab/shared";
 import { useEnsurePlayer, useMeSummary } from "@/features/player/hooks";
 import { useLogout } from "@/features/auth/hooks";
 import { formatScore } from "@/lib/utils";
-import { Card, ProgressBar, Spinner } from "@/components/ui";
-import { useRouter } from "next/navigation";
+import { ProgressBar, Spinner } from "@/components/ui";
+import { Reveal, StaggerIn } from "@/components/motion";
 
-const CATEGORY_COLORS: Record<string, string> = {
-  SPEED: "from-amber-100 to-amber-50 border-amber-200",
-  MEMORY: "from-blue-100 to-blue-50 border-blue-200",
-  ATTENTION: "from-emerald-100 to-emerald-50 border-emerald-200",
-  PRECISION: "from-pink-100 to-pink-50 border-pink-200",
-  TYPING: "from-cyan-100 to-cyan-50 border-cyan-200",
+const CATEGORY_TINT: Record<string, string> = {
+  SPEED: "bg-amber-100",
+  MEMORY: "bg-blue-100",
+  ATTENTION: "bg-emerald-100",
+  PRECISION: "bg-pink-100",
+  TYPING: "bg-cyan-100",
 };
 
-/** Hub de juegos: misiones del día, racha, XP y las cards de los 8 benchmarks. */
+/** Hub del jugador: saludo, racha, misiones del día y los 8 juegos. */
 export default function PlayHubPage() {
   const router = useRouter();
   const { principal, ready, isLoading } = useEnsurePlayer();
@@ -28,110 +29,139 @@ export default function PlayHubPage() {
 
   if (isLoading || !ready) return <Spinner label="Preparando tu espacio…" />;
   const s = summary.data;
+  const name = principal && principal.kind !== "staff" ? principal.displayName : "";
 
   return (
-    <main className="kid-zone min-h-dvh bg-slate-50 pb-16">
-      <div className="mx-auto max-w-3xl px-4 pt-6">
-        {/* Header con progreso */}
-        <Card className="bg-gradient-to-r from-brand-600 to-brand-500 text-white border-0">
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-3">
-              <span className="text-5xl">{s ? avatarEmoji(s.avatarId) : "🙂"}</span>
-              <div>
-                <p className="text-xl font-black">
-                  ¡Hola{" "}
-                  {principal && principal.kind !== "staff" ? principal.displayName : ""}!
-                </p>
-                {s && (
-                  <p className="text-sm font-bold text-white/80">
-                    Nivel {s.level} · {s.totalAttempts} partidas
-                    {s.isGuest && " · Modo Libre"}
-                  </p>
-                )}
-              </div>
-            </div>
-            <div className="text-right">
-              {s && s.currentStreak > 0 && (
-                <p className="text-2xl font-black">🔥 {s.currentStreak}</p>
-              )}
-              <div className="flex gap-3 text-sm font-bold text-white/70">
-                <Link href="/me" className="underline">
-                  Mi progreso
-                </Link>
-                <Link href="/rankings" className="underline">
-                  Rankings
-                </Link>
-                <button
-                  className="underline"
-                  onClick={() => logout.mutate(undefined, { onSuccess: () => router.push("/") })}
+    <main className="kid-zone min-h-dvh bg-cream-50 pb-20">
+      <StaggerIn className="mx-auto max-w-3xl px-4 pt-8">
+        {/* Saludo editorial */}
+        <Reveal>
+          <div className="flex items-end justify-between gap-3">
+            <div>
+              <p className="font-display text-sm font-bold uppercase tracking-[0.18em] text-ink-400">
+                {s?.isGuest ? "Modo libre" : "Tu entrenamiento"}
+              </p>
+              <h1 className="mt-1 text-4xl font-bold tracking-tight sm:text-5xl">
+                ¡Hola, {name}!{" "}
+                <motion.span
+                  className="inline-block"
+                  animate={{ rotate: [0, 16, -8, 12, 0] }}
+                  transition={{ delay: 0.8, duration: 1.1, ease: "easeInOut" }}
                 >
-                  Salir
-                </button>
-              </div>
+                  👋
+                </motion.span>
+              </h1>
             </div>
+            <span className="text-6xl">{s ? avatarEmoji(s.avatarId) : "🙂"}</span>
           </div>
-          {s && (
-            <div className="mt-3">
+        </Reveal>
+
+        {/* Nivel + racha */}
+        {s && (
+          <Reveal className="mt-6">
+            <div className="rounded-[1.75rem] border border-ink-900/8 bg-[#fffdf6] p-5 shadow-[0_2px_20px_-8px_rgba(32,27,18,0.12)]">
+              <div className="flex items-center justify-between">
+                <p className="font-display text-lg font-bold">
+                  Nivel {s.level}
+                  <span className="ml-2 text-sm font-semibold text-ink-400">
+                    {s.xpIntoLevel}/{s.xpForNextLevel} XP
+                  </span>
+                </p>
+                <div className="flex items-center gap-4">
+                  {s.currentStreak > 0 && (
+                    <motion.p
+                      className="font-display text-lg font-bold text-brand-600"
+                      animate={{ scale: [1, 1.12, 1] }}
+                      transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                    >
+                      🔥 {s.currentStreak} días
+                    </motion.p>
+                  )}
+                  <nav className="flex gap-3 text-sm font-bold text-ink-400">
+                    <Link href="/me" className="transition-colors hover:text-ink-900">
+                      Mi progreso
+                    </Link>
+                    <Link href="/rankings" className="transition-colors hover:text-ink-900">
+                      Rankings
+                    </Link>
+                    <button
+                      className="transition-colors hover:text-ink-900"
+                      onClick={() =>
+                        logout.mutate(undefined, { onSuccess: () => router.push("/") })
+                      }
+                    >
+                      Salir
+                    </button>
+                  </nav>
+                </div>
+              </div>
               <ProgressBar
                 value={s.xpIntoLevel}
                 max={s.xpForNextLevel}
-                className="bg-white/20"
-                barClassName="bg-amber-300"
+                className="mt-3"
+                barClassName="bg-gradient-to-r from-brand-400 to-brand-600"
               />
-              <p className="mt-1 text-xs font-bold text-white/70">
-                {s.xpIntoLevel}/{s.xpForNextLevel} XP para el nivel {s.level + 1}
-              </p>
             </div>
-          )}
-        </Card>
+          </Reveal>
+        )}
 
         {/* Misiones del día */}
         {s && s.missions.length > 0 && (
-          <Card className="mt-4">
-            <h2 className="font-black text-slate-700">📋 Misiones de hoy</h2>
-            <div className="mt-2 space-y-2">
-              {s.missions.map((m) => (
-                <div key={m.code} className="flex items-center gap-3">
-                  <span className="text-2xl">{m.completed ? "✅" : m.emoji}</span>
-                  <div className="flex-1">
-                    <p
-                      className={`text-sm font-bold ${m.completed ? "text-slate-400 line-through" : "text-slate-600"}`}
-                    >
-                      {m.title}
-                    </p>
-                    <ProgressBar
-                      value={m.progress}
-                      max={m.target}
-                      className="mt-1 h-2"
-                      barClassName={m.completed ? "bg-emerald-400" : "bg-brand-400"}
-                    />
+          <Reveal className="mt-4">
+            <div className="rounded-[1.75rem] border border-ink-900/8 bg-[#fffdf6] p-5 shadow-[0_2px_20px_-8px_rgba(32,27,18,0.12)]">
+              <h2 className="font-display text-lg font-bold">Misiones de hoy 📋</h2>
+              <div className="mt-3 space-y-3">
+                {s.missions.map((m) => (
+                  <div key={m.code} className="flex items-center gap-3">
+                    <span className="text-2xl">{m.completed ? "✅" : m.emoji}</span>
+                    <div className="flex-1">
+                      <p
+                        className={`text-sm font-bold ${m.completed ? "text-ink-300 line-through" : "text-ink-700"}`}
+                      >
+                        {m.title}
+                      </p>
+                      <ProgressBar
+                        value={m.progress}
+                        max={m.target}
+                        className="mt-1.5 h-2"
+                        barClassName={m.completed ? "bg-emerald-500" : "bg-brand-500"}
+                      />
+                    </div>
+                    <span className="font-display text-xs font-bold text-brand-600">
+                      +{m.xpReward} XP
+                    </span>
                   </div>
-                  <span className="text-xs font-black text-brand-500">+{m.xpReward} XP</span>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </Card>
+          </Reveal>
         )}
 
         {/* Juegos */}
-        <h2 className="mt-6 px-1 text-xl font-black text-slate-700">Elegí tu juego</h2>
-        <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
+        <Reveal className="mt-8">
+          <h2 className="text-2xl font-bold tracking-tight">Elegí tu reto</h2>
+        </Reveal>
+        <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
           {catalog.map((b, i) => {
             const stats = s?.perBenchmark.find((p) => p.benchmarkSlug === b.slug);
             return (
               <motion.div
                 key={b.slug}
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.05 }}
+                initial={{ opacity: 0, y: 26, scale: 0.96 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{ delay: 0.25 + i * 0.06, type: "spring", stiffness: 170, damping: 20 }}
               >
                 <Link
                   href={`/play/${b.slug}`}
-                  className={`block rounded-3xl border bg-gradient-to-b p-4 text-center shadow-sm transition-all hover:scale-[1.03] hover:shadow-md active:scale-95 ${CATEGORY_COLORS[b.category] ?? ""}`}
+                  className="group block rounded-[1.75rem] border border-ink-900/8 bg-[#fffdf6] p-4 text-center shadow-[0_2px_20px_-8px_rgba(32,27,18,0.12)] transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_22px_40px_-16px_rgba(32,27,18,0.28)] active:scale-95"
                 >
-                  <p className="text-5xl">{b.icon}</p>
-                  <p className="mt-2 font-black text-slate-700">{b.name}</p>
-                  <p className="mt-0.5 text-xs font-semibold text-slate-500">
+                  <span
+                    className={`mx-auto flex h-16 w-16 items-center justify-center rounded-2xl text-4xl transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-6 ${CATEGORY_TINT[b.category] ?? "bg-cream-100"}`}
+                  >
+                    {b.icon}
+                  </span>
+                  <p className="mt-2.5 font-display font-bold leading-tight">{b.name}</p>
+                  <p className="mt-1 text-xs font-semibold text-ink-400">
                     {stats?.bestScore != null
                       ? `Récord: ${formatScore(stats.bestScore, b.unit)}`
                       : "¡Probalo!"}
@@ -141,7 +171,7 @@ export default function PlayHubPage() {
             );
           })}
         </div>
-      </div>
+      </StaggerIn>
     </main>
   );
 }
