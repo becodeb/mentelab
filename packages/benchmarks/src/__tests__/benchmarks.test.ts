@@ -19,6 +19,14 @@ describe("registry", () => {
       "color-trap",
       "quick-math",
       "memory-pairs",
+      "rhythm-keeper",
+      "perfect-stop",
+      "pursuit",
+      "number-hunt",
+      "speed-match",
+      "trail-path",
+      "flash-count",
+      "twin-shapes",
     ]);
   });
 
@@ -51,7 +59,7 @@ describe("registry", () => {
 
   it("el catálogo serializa sin funciones", () => {
     const cat = serializeCatalog();
-    expect(cat).toHaveLength(12);
+    expect(cat).toHaveLength(20);
     expect(JSON.parse(JSON.stringify(cat))).toEqual(cat);
   });
 });

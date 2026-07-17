@@ -11,6 +11,14 @@ import { oddOneOut } from "./benchmarks/odd-one-out";
 import { colorTrap } from "./benchmarks/color-trap";
 import { quickMath } from "./benchmarks/quick-math";
 import { memoryPairs } from "./benchmarks/memory-pairs";
+import { rhythmKeeper } from "./benchmarks/rhythm-keeper";
+import { perfectStop } from "./benchmarks/perfect-stop";
+import { pursuit } from "./benchmarks/pursuit";
+import { numberHunt } from "./benchmarks/number-hunt";
+import { speedMatch } from "./benchmarks/speed-match";
+import { trailPath } from "./benchmarks/trail-path";
+import { flashCount } from "./benchmarks/flash-count";
+import { twinShapes } from "./benchmarks/twin-shapes";
 
 /**
  * Registro central de benchmarks. Para agregar uno nuevo:
@@ -33,6 +41,16 @@ const ALL: BenchmarkDefinition<unknown, unknown>[] = [
   colorTrap,
   quickMath,
   memoryPairs,
+  // Habilidad motora pura:
+  rhythmKeeper,
+  perfectStop,
+  pursuit,
+  // Clásicos del entrenamiento cognitivo:
+  numberHunt,
+  speedMatch,
+  trailPath,
+  flashCount,
+  twinShapes,
 ] as BenchmarkDefinition<unknown, unknown>[];
 
 export const benchmarkRegistry: ReadonlyMap<string, BenchmarkDefinition<unknown, unknown>> =

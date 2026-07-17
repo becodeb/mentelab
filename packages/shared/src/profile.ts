@@ -34,6 +34,9 @@ export const MeSummarySchema = z.object({
       totalAttempts: z.number().int(),
       bestScore: z.number().nullable(),
       lastPlayedAt: z.string().nullable(),
+      /** Posición en el curso (30 días, mejor marca) — solo alumnos. */
+      classroomRank: z.number().int().nullable(),
+      classroomTotal: z.number().int().nullable(),
     }),
   ),
 });

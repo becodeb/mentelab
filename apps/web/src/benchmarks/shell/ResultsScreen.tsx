@@ -4,12 +4,22 @@ import { useEffect } from "react";
 import Link from "next/link";
 import confetti from "canvas-confetti";
 import { motion } from "framer-motion";
+import { useQuery } from "@tanstack/react-query";
 import { getBenchmark } from "@mentelab/benchmarks";
-import type { CompleteAttemptResponse } from "@mentelab/shared";
+import type { CompleteAttemptResponse, LeaderboardResponse } from "@mentelab/shared";
+import { api } from "@/lib/api";
 import { formatScore } from "@/lib/utils";
+import { useSession } from "@/features/auth/hooks";
 import { Button, ProgressBar } from "@/components/ui";
 import { sfx } from "@/lib/sfx";
-import { ChartIcon, CheckIcon, FlameIcon, MissionIcon, TrophyIcon } from "@/components/icons";
+import {
+  ChartIcon,
+  CheckIcon,
+  FlameIcon,
+  MissionIcon,
+  Monogram,
+  TrophyIcon,
+} from "@/components/icons";
 
 /**
  * Pantalla de resultados (doc 04 §2): SIEMPRE abre con lo positivo personal
@@ -180,15 +190,17 @@ export function ResultsScreen({
           </motion.div>
         )}
 
-        {/* Posición (al final, en positivo, solo si está habilitada) */}
+        {/* Ranking del curso: podio + tu posición, apenas terminás (competencia sana) */}
+        <CourseRankPanel slug={slug} />
+
         {result.classroomRank != null && (
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 1 }}
-            className="mt-4 text-center text-sm font-bold text-ink-400"
+            className="mt-3 text-center text-sm font-bold text-ink-400"
           >
-            Vas {result.classroomRank}º en tu curso este mes. ¡Seguí así!
+            ¡Seguí así! Cada partida cuenta.
           </motion.p>
         )}
 
@@ -213,6 +225,103 @@ export function ResultsScreen({
           </Link>
         </motion.div>
       </div>
+    </motion.div>
+  );
+}
+
+/**
+ * Podio del curso apenas termina la partida: top 3 + tu posición.
+ * Es EL momento de máxima motivación para picarse sanamente con compañeros.
+ */
+function CourseRankPanel({ slug }: { slug: string }) {
+  const session = useSession();
+  const isStudent = session.data?.principal?.kind === "student";
+  const board = useQuery({
+    queryKey: ["post-game-rank", slug],
+    queryFn: () =>
+      api.get<LeaderboardResponse>(
+        `/v1/leaderboards?scope=classroom&benchmark=${slug}&period=30d&metric=best&around=me&limit=3`,
+      ),
+    enabled: isStudent,
+    staleTime: 0,
+  });
+
+  if (!isStudent || !board.data || board.data.entries.length === 0) return null;
+  const { entries, myEntry, totalPlayers, unit } = board.data;
+  const top = entries.slice(0, 3);
+  const meInTop = myEntry && top.some((e) => e.playerId === myEntry.playerId);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 1.05, type: "spring", stiffness: 160, damping: 20 }}
+      className="mt-4 rounded-[1.75rem] border border-ink-900/8 bg-[#fffdf6] p-5 shadow-[0_2px_20px_-8px_rgba(32,27,18,0.12)]"
+    >
+      <div className="flex items-center justify-between">
+        <h3 className="inline-flex items-center gap-2 font-display text-lg font-semibold text-ink-900">
+          <TrophyIcon className="h-5 w-5 text-amber-600" /> Ranking del curso
+        </h3>
+        <Link href="/rankings" className="text-xs font-bold text-brand-600 hover:underline">
+          ver completo →
+        </Link>
+      </div>
+      <div className="mt-3 space-y-1.5">
+        {top.map((e, i) => (
+          <motion.div
+            key={e.playerId}
+            initial={{ opacity: 0, x: -16 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 1.15 + i * 0.1 }}
+            className={`flex items-center gap-3 rounded-2xl px-3 py-2 ${
+              e.isMe ? "bg-brand-50 ring-2 ring-brand-300" : "bg-cream-100"
+            }`}
+          >
+            <span
+              className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full font-display text-sm font-bold ${
+                e.rank === 1
+                  ? "bg-amber-400 text-ink-900"
+                  : e.rank === 2
+                    ? "bg-cream-300 text-ink-700"
+                    : "bg-brand-300 text-ink-900"
+              }`}
+            >
+              {e.rank}º
+            </span>
+            <Monogram name={e.displayName} seed={e.playerId} className="h-8 w-8 text-sm" />
+            <span className="flex-1 truncate text-sm font-bold text-ink-700">
+              {e.displayName}
+              {e.isMe && " (vos)"}
+            </span>
+            <span className="font-display text-sm font-bold text-ink-600">
+              {formatScore(e.value, unit)}
+            </span>
+          </motion.div>
+        ))}
+        {myEntry && !meInTop && (
+          <>
+            <p className="text-center font-display text-xs font-bold text-ink-300">···</p>
+            <div className="flex items-center gap-3 rounded-2xl bg-brand-50 px-3 py-2 ring-2 ring-brand-300">
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-cream-100 font-display text-sm font-bold text-ink-700">
+                {myEntry.rank}º
+              </span>
+              <Monogram name={myEntry.displayName} seed={myEntry.playerId} className="h-8 w-8 text-sm" />
+              <span className="flex-1 truncate text-sm font-bold text-ink-700">
+                {myEntry.displayName} (vos)
+              </span>
+              <span className="font-display text-sm font-bold text-ink-600">
+                {formatScore(myEntry.value, unit)}
+              </span>
+            </div>
+          </>
+        )}
+      </div>
+      {myEntry && (
+        <p className="mt-3 text-center text-xs font-bold text-ink-400">
+          Vas {myEntry.rank}º de {totalPlayers} este mes
+          {myEntry.rank > 1 && " — ¡una partida más y los alcanzás!"}
+        </p>
+      )}
     </motion.div>
   );
 }

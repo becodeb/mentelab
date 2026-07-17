@@ -45,4 +45,28 @@ export const gameComponents: Record<string, GameComponent> = {
   "memory-pairs": dynamic(() =>
     import("./games/MemoryPairsGame").then((m) => m.MemoryPairsGame),
   ) as GameComponent,
+  "rhythm-keeper": dynamic(() =>
+    import("./games/RhythmKeeperGame").then((m) => m.RhythmKeeperGame),
+  ) as GameComponent,
+  "perfect-stop": dynamic(() =>
+    import("./games/PerfectStopGame").then((m) => m.PerfectStopGame),
+  ) as GameComponent,
+  "pursuit": dynamic(() =>
+    import("./games/PursuitGame").then((m) => m.PursuitGame),
+  ) as GameComponent,
+  "number-hunt": dynamic(() =>
+    import("./games/NumberHuntGame").then((m) => m.NumberHuntGame),
+  ) as GameComponent,
+  "speed-match": dynamic(() =>
+    import("./games/SpeedMatchGame").then((m) => m.SpeedMatchGame),
+  ) as GameComponent,
+  "trail-path": dynamic(() =>
+    import("./games/TrailPathGame").then((m) => m.TrailPathGame),
+  ) as GameComponent,
+  "flash-count": dynamic(() =>
+    import("./games/FlashCountGame").then((m) => m.FlashCountGame),
+  ) as GameComponent,
+  "twin-shapes": dynamic(() =>
+    import("./games/TwinShapesGame").then((m) => m.TwinShapesGame),
+  ) as GameComponent,
 };

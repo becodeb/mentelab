@@ -54,7 +54,7 @@ export function dailyMissionsFor(playerId: string, dateIso: string): MissionDef[
     variety = {
       code: `play-benchmark-${slug}`,
       kind: "play_benchmark",
-      title: `Jugá una de ${def.name} ${def.icon}`,
+      title: `Jugá una de ${def.name}`,
       emoji: def.icon,
       target: 1,
       xpReward: 20,

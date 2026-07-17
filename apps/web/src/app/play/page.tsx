@@ -10,11 +10,12 @@ import { formatScore } from "@/lib/utils";
 import { ProgressBar, Spinner } from "@/components/ui";
 import { Reveal, StaggerIn } from "@/components/motion";
 import {
+  BrainMark,
   ChartIcon,
   CheckIcon,
   FlameIcon,
   GameIcon,
-  LaurelIcon,
+  LevelMedallion,
   LogoutIcon,
   MissionIcon,
   Monogram,
@@ -43,49 +44,59 @@ export default function PlayHubPage() {
 
   return (
     <main className="kid-zone min-h-dvh bg-cream-50 pb-20">
-      <StaggerIn className="mx-auto max-w-3xl px-4 pt-8">
-        {/* Saludo editorial */}
+      <StaggerIn className="mx-auto max-w-4xl px-5 pt-5">
+        {/* Barra superior: marca + navegación (nunca se corta) */}
         <Reveal>
-          <div className="flex items-end justify-between gap-3">
-            <div>
-              <p className="font-display text-sm font-bold uppercase tracking-[0.22em] text-brand-600">
-                {s?.isGuest ? "Modo libre" : "Tu entrenamiento"}
-              </p>
-              <h1 className="mt-1 text-5xl font-semibold tracking-tight sm:text-6xl">
-                ¡Hola, <em className="text-brand-600">{name}</em>!
-              </h1>
-              <p className="mt-2 text-lg font-medium text-ink-500">
-                Entrená tu mente. Superá tus marcas. Disfrutá el proceso.
-              </p>
-            </div>
-            <div className="flex items-center gap-4">
-              <nav className="hidden items-center gap-4 text-sm font-bold text-ink-400 sm:flex">
-                <Link href="/me" className="inline-flex items-center gap-1.5 transition-colors hover:text-ink-900">
-                  <ChartIcon className="h-4 w-4" /> Mi progreso
-                </Link>
-                <Link href="/rankings" className="inline-flex items-center gap-1.5 transition-colors hover:text-ink-900">
-                  <TrophyIcon className="h-4 w-4" /> Rankings
-                </Link>
-                <button
-                  className="inline-flex items-center gap-1.5 transition-colors hover:text-ink-900"
-                  onClick={() => logout.mutate(undefined, { onSuccess: () => router.push("/") })}
-                >
-                  <LogoutIcon className="h-4 w-4" /> Salir
-                </button>
-              </nav>
-              <Monogram name={name || "?"} seed={s?.playerId} className="h-14 w-14 text-2xl" />
-            </div>
+          <div className="flex items-center justify-between border-b border-ink-900/8 pb-4">
+            <p className="inline-flex items-center gap-2 font-display text-lg font-bold tracking-tight">
+              <BrainMark className="h-6 w-6 text-brand-600" />
+              Mente<span className="-ml-1 text-brand-600">Lab</span>
+            </p>
+            <nav className="flex items-center gap-3 sm:gap-5">
+              <Link
+                href="/me"
+                className="inline-flex items-center gap-1.5 whitespace-nowrap text-sm font-bold text-ink-400 transition-colors hover:text-ink-900"
+              >
+                <ChartIcon className="h-4 w-4" />
+                <span className="hidden sm:inline">Mi progreso</span>
+              </Link>
+              <Link
+                href="/rankings"
+                className="inline-flex items-center gap-1.5 whitespace-nowrap text-sm font-bold text-ink-400 transition-colors hover:text-ink-900"
+              >
+                <TrophyIcon className="h-4 w-4" />
+                <span className="hidden sm:inline">Rankings</span>
+              </Link>
+              <button
+                className="inline-flex items-center gap-1.5 whitespace-nowrap text-sm font-bold text-ink-400 transition-colors hover:text-ink-900"
+                onClick={() => logout.mutate(undefined, { onSuccess: () => router.push("/") })}
+              >
+                <LogoutIcon className="h-4 w-4" />
+                <span className="hidden sm:inline">Salir</span>
+              </button>
+              <Monogram name={name || "?"} seed={s?.playerId} className="h-10 w-10 text-lg" />
+            </nav>
           </div>
+        </Reveal>
+
+        {/* Saludo editorial */}
+        <Reveal className="mt-7">
+          <p className="font-display text-sm font-bold uppercase tracking-[0.22em] text-brand-600">
+            {s?.isGuest ? "Modo libre" : "Tu entrenamiento"}
+          </p>
+          <h1 className="mt-1.5 text-5xl font-semibold tracking-tight sm:text-6xl">
+            ¡Hola, <em className="text-brand-600">{name}</em>!
+          </h1>
+          <p className="mt-2.5 text-lg font-medium text-ink-500">
+            Entrená tu mente. Superá tus marcas. Disfrutá el proceso.
+          </p>
         </Reveal>
 
         {/* Nivel + racha */}
         {s && (
           <Reveal className="mt-7">
             <div className="flex items-center gap-5 rounded-[1.75rem] border border-ink-900/8 bg-[#fffdf6] p-5 shadow-[0_2px_20px_-8px_rgba(32,27,18,0.12)]">
-              <div className="relative flex h-16 w-16 shrink-0 items-center justify-center">
-                <LaurelIcon className="absolute inset-0 h-full w-full text-amber-500" />
-                <span className="font-display text-2xl font-bold text-ink-900">{s.level}</span>
-              </div>
+              <LevelMedallion level={s.level} />
               <div className="flex-1">
                 <div className="flex items-baseline justify-between">
                   <p className="font-display text-xl font-semibold">Nivel {s.level}</p>
@@ -197,6 +208,16 @@ export default function PlayHubPage() {
                       ? `Récord: ${formatScore(stats.bestScore, b.unit)}`
                       : "¡Probalo!"}
                   </p>
+                  {stats?.classroomRank != null && (
+                    <p
+                      className={`mt-0.5 inline-flex items-center gap-1 text-xs font-bold ${
+                        stats.classroomRank <= 3 ? "text-amber-600" : "text-brand-600"
+                      }`}
+                    >
+                      <TrophyIcon className="h-3.5 w-3.5" />
+                      Vas {stats.classroomRank}º de {stats.classroomTotal}
+                    </p>
+                  )}
                   <span
                     className={`absolute inset-x-6 bottom-0 h-1 rounded-t-full ${accent.bar} opacity-70 transition-all duration-300 group-hover:inset-x-3 group-hover:opacity-100`}
                   />
