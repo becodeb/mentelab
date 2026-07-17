@@ -1,5 +1,5 @@
 # ---- Base: pnpm ----
-FROM node:20-alpine AS base
+FROM node:20-slim AS base
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable && corepack prepare pnpm@11.13.0 --activate
@@ -29,14 +29,14 @@ ENV NEXT_TELEMETRY_DISABLED=1
 RUN pnpm --filter @mentelab/web build
 
 # ---- Runner ----
-FROM node:20-alpine AS runner
+FROM node:20-slim AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
-RUN addgroup -g 1001 -S nodejs && \
-    adduser -S nextjs -u 1001
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 --ingroup nodejs nextjs
 
 # Copy standalone output from builder
 COPY --from=builder /app/apps/web/.next/standalone ./
