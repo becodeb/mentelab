@@ -1,0 +1,49 @@
+# ---- Base: pnpm ----
+FROM node:20-alpine AS base
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable && corepack prepare pnpm@11.13.0 --activate
+
+# ---- Dependencies ----
+FROM base AS deps
+WORKDIR /app
+
+COPY pnpm-lock.yaml pnpm-workspace.yaml package.json turbo.json ./
+
+# Copy workspace package.json files for install
+COPY apps/web/package.json apps/web/
+COPY packages/config/package.json packages/config/
+COPY packages/shared/package.json packages/shared/
+COPY packages/benchmarks/package.json packages/benchmarks/
+
+RUN pnpm install --frozen-lockfile
+
+# ---- Builder ----
+FROM deps AS builder
+COPY . .
+
+# Generate Prisma client if needed by shared packages
+RUN pnpm --filter @mentelab/db generate 2>/dev/null || true
+
+ENV NEXT_TELEMETRY_DISABLED=1
+RUN pnpm --filter @mentelab/web build
+
+# ---- Runner ----
+FROM node:20-alpine AS runner
+WORKDIR /app
+
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nextjs -u 1001
+
+# Copy standalone output from builder
+COPY --from=builder /app/apps/web/.next/standalone ./
+COPY --from=builder /app/apps/web/.next/static ./apps/web/.next/static
+COPY --from=builder /app/apps/web/public ./apps/web/public
+
+USER nextjs
+EXPOSE 3000
+
+CMD ["node", "apps/web/server.js"]
