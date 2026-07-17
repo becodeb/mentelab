@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useStaffLogin } from "@/features/auth/hooks";
 import { Button, Card, Input } from "@/components/ui";
+import { BrainMark } from "@/components/icons";
 
 export default function TeacherLoginPage() {
   const router = useRouter();
@@ -25,8 +26,8 @@ export default function TeacherLoginPage() {
   return (
     <main className="flex min-h-dvh items-center justify-center bg-slate-100 p-6">
       <Card className="w-full max-w-md">
-        <p className="text-center text-4xl">🍎</p>
-        <h1 className="mt-2 text-center text-2xl font-black text-slate-800">Panel docente</h1>
+        <BrainMark className="mx-auto h-12 w-12 text-brand-600" />
+        <h1 className="mt-3 text-center text-3xl font-semibold text-slate-800">Panel docente</h1>
         <form onSubmit={submit} className="mt-6 space-y-3">
           <Input
             type="email"

@@ -12,6 +12,8 @@ import type { BenchmarkStats } from "@mentelab/shared";
 import { useAttemptRunner } from "./useAttemptRunner";
 import { ResultsScreen } from "./ResultsScreen";
 import type { GameComponent } from "./types";
+import { sfx } from "@/lib/sfx";
+import { GameIcon, SoundOffIcon, SoundOnIcon, TrophyIcon } from "@/components/icons";
 
 /**
  * Shell común de todos los juegos (doc 02 §3): instrucciones → countdown →
@@ -39,14 +41,14 @@ export function GameShell({ slug, Game }: { slug: string; Game: GameComponent })
             className="flex min-h-dvh items-center justify-center p-6"
           >
             <div className="w-full max-w-lg">
-              <motion.p
-                initial={{ scale: 0, rotate: -20 }}
+              <motion.div
+                initial={{ scale: 0, rotate: -14 }}
                 animate={{ scale: 1, rotate: 0 }}
                 transition={{ type: "spring", stiffness: 200, damping: 14, delay: 0.1 }}
-                className="text-center text-8xl"
+                className="mx-auto flex h-28 w-28 items-center justify-center rounded-full border-2 border-ink-900/10 bg-[#fffdf6] shadow-[0_10px_30px_-12px_rgba(32,27,18,0.35)]"
               >
-                {def.icon}
-              </motion.p>
+                <GameIcon slug={slug} className="h-14 w-14 text-ink-900" />
+              </motion.div>
               <motion.h1
                 initial={{ opacity: 0, y: 24 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -81,16 +83,20 @@ export function GameShell({ slug, Game }: { slug: string; Game: GameComponent })
                   ¡Jugar! →
                 </Button>
                 {stats.data?.bestScore != null && (
-                  <p className="mt-3 font-display font-bold text-ink-400">
-                    Tu récord: {formatScore(stats.data.bestScore, def.unit)} 🏆
+                  <p className="mt-3 inline-flex items-center gap-2 font-display font-bold text-ink-400">
+                    <TrophyIcon className="h-4 w-4" /> Tu récord:{" "}
+                    {formatScore(stats.data.bestScore, def.unit)}
                   </p>
                 )}
-                <Link
-                  href="/play"
-                  className="mt-3 inline-block text-sm font-bold text-ink-300 transition-colors hover:text-ink-700"
-                >
-                  ← volver a los juegos
-                </Link>
+                <div className="mt-3 flex items-center justify-center gap-5">
+                  <Link
+                    href="/play"
+                    className="text-sm font-bold text-ink-300 transition-colors hover:text-ink-700"
+                  >
+                    ← volver a los juegos
+                  </Link>
+                  <MuteToggle />
+                </div>
               </motion.div>
             </div>
           </motion.div>
@@ -134,6 +140,21 @@ export function GameShell({ slug, Game }: { slug: string; Game: GameComponent })
   );
 }
 
+/** Silenciar/activar sonidos (persistente por dispositivo). */
+function MuteToggle() {
+  const [muted, setMuted] = useState(() => sfx.muted);
+  return (
+    <button
+      onClick={() => setMuted(sfx.toggleMuted())}
+      className="inline-flex items-center gap-1.5 text-sm font-bold text-ink-300 transition-colors hover:text-ink-700"
+      aria-label={muted ? "Activar sonido" : "Silenciar"}
+    >
+      {muted ? <SoundOffIcon className="h-4 w-4" /> : <SoundOnIcon className="h-4 w-4" />}
+      {muted ? "sin sonido" : "sonido"}
+    </button>
+  );
+}
+
 /** Countdown 3-2-1: número gigante + anillo que se dibuja (mismo ritual siempre). */
 function Countdown({ onDone }: { onDone: () => void }) {
   const [n, setN] = useState(3);
@@ -142,6 +163,7 @@ function Countdown({ onDone }: { onDone: () => void }) {
       onDone();
       return;
     }
+    sfx.tick();
     const t = setTimeout(() => setN(n - 1), 700);
     return () => clearTimeout(t);
   }, [n, onDone]);
@@ -170,8 +192,8 @@ function Countdown({ onDone }: { onDone: () => void }) {
         </svg>
         <motion.p
           key={n}
-          initial={{ scale: 2.4, opacity: 0, filter: "blur(8px)" }}
-          animate={{ scale: 1, opacity: 1, filter: "blur(0px)" }}
+          initial={{ scale: 2.2, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
           transition={{ type: "spring", stiffness: 220, damping: 18 }}
           className="font-display text-8xl font-bold text-cream-50"
         >

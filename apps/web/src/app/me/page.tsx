@@ -13,15 +13,12 @@ import {
   ReferenceDot,
 } from "recharts";
 import { serializeCatalog, getBenchmark } from "@mentelab/benchmarks";
-import {
-  COGNITIVE_INDICATOR_LABELS,
-  avatarEmoji,
-  type BenchmarkStats,
-} from "@mentelab/shared";
+import { COGNITIVE_INDICATOR_LABELS, type BenchmarkStats } from "@mentelab/shared";
 import { api } from "@/lib/api";
 import { formatDate, formatMs, formatScore } from "@/lib/utils";
 import { useCognitiveProfile, useEnsurePlayer, useMeSummary, useMyBadges } from "@/features/player/hooks";
 import { Card, Chip, ProgressBar, Spinner, EmptyState } from "@/components/ui";
+import { FlameIcon, LaurelIcon, Monogram, TrophyIcon } from "@/components/icons";
 
 /** Perfil del alumno: progreso, perfil cognitivo, evolución e insignias. */
 export default function MePage() {
@@ -47,19 +44,23 @@ export default function MePage() {
       <div className="mx-auto max-w-3xl space-y-4 px-4 pt-6">
         <Card>
           <div className="flex items-center gap-4">
-            <span className="text-6xl">{avatarEmoji(s.avatarId)}</span>
+            <Monogram name={s.displayName} seed={s.playerId} className="h-16 w-16 text-3xl" />
             <div className="flex-1">
-              <p className="text-2xl font-black text-slate-800">{s.displayName}</p>
-              <div className="mt-1 flex flex-wrap gap-2">
-                <Chip>⭐ Nivel {s.level}</Chip>
-                <Chip className="bg-orange-50 text-orange-600">🔥 {s.currentStreak} días</Chip>
-                <Chip className="bg-emerald-50 text-emerald-600">
-                  🎮 {s.totalAttempts} partidas
+              <p className="font-display text-3xl font-semibold text-slate-800">{s.displayName}</p>
+              <div className="mt-1.5 flex flex-wrap gap-2">
+                <Chip>
+                  <LaurelIcon className="h-4 w-4 text-amber-600" /> Nivel {s.level}
                 </Chip>
-                <Chip className="bg-cyan-50 text-cyan-600">⏱️ {formatMs(s.totalPlayMs)}</Chip>
+                <Chip className="bg-brand-50 text-brand-700">
+                  <FlameIcon className="h-4 w-4" /> {s.currentStreak} días
+                </Chip>
+                <Chip className="bg-emerald-50 text-emerald-600">
+                  {s.totalAttempts} partidas
+                </Chip>
+                <Chip className="bg-cyan-50 text-cyan-600">{formatMs(s.totalPlayMs)}</Chip>
               </div>
             </div>
-            <Link href="/play" className="font-black text-brand-600">
+            <Link href="/play" className="font-display font-bold text-brand-600">
               Jugar →
             </Link>
           </div>
@@ -68,7 +69,7 @@ export default function MePage() {
 
         {/* Perfil cognitivo */}
         <Card>
-          <h2 className="font-black text-slate-700">🧠 Mi perfil cognitivo</h2>
+          <h2 className="text-xl font-semibold text-slate-700">Mi perfil cognitivo</h2>
           {cognitive.data ? (
             <>
               <div className="mt-3 space-y-2.5">
@@ -113,7 +114,7 @@ export default function MePage() {
         {/* Evolución por benchmark */}
         <Card>
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <h2 className="font-black text-slate-700">📈 Mi evolución</h2>
+            <h2 className="text-xl font-semibold text-slate-700">Mi evolución</h2>
             <select
               value={selectedSlug}
               onChange={(e) => setSelectedSlug(e.target.value)}
@@ -130,7 +131,7 @@ export default function MePage() {
             <StatsDetail stats={stats.data} slug={selectedSlug} />
           ) : (
             <EmptyState
-              emoji="🎮"
+              emoji="✦"
               title="Todavía no jugaste este juego"
               hint="¡Jugalo y acá vas a ver tu progreso!"
             />
@@ -139,8 +140,8 @@ export default function MePage() {
 
         {/* Insignias */}
         <Card>
-          <h2 className="font-black text-slate-700">
-            🏅 Mis insignias ({earnedBadges.length}/{badges.data?.badges.length ?? 0})
+          <h2 className="text-xl font-semibold text-slate-700">
+            Mis insignias ({earnedBadges.length}/{badges.data?.badges.length ?? 0})
           </h2>
           <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
             {(badges.data?.badges ?? [])
@@ -155,7 +156,7 @@ export default function MePage() {
                   }`}
                   title={b.description}
                 >
-                  <p className="text-2xl">{b.earnedAt ? b.emoji : "🔒"}</p>
+                  <p className="text-2xl">{b.earnedAt ? b.emoji : "·"}</p>
                   <p className="text-sm font-black text-slate-700">{b.name}</p>
                   <p className="text-xs font-semibold text-slate-400">{b.description}</p>
                 </div>
@@ -180,7 +181,7 @@ function StatsDetail({ stats, slug }: { stats: BenchmarkStats; slug: string }) {
     <div className="mt-3">
       <div className="flex flex-wrap gap-2">
         <Chip className="bg-amber-50 text-amber-600">
-          🏆 Récord: {formatScore(stats.bestScore, def.unit)}
+          <TrophyIcon className="h-4 w-4" /> Récord: {formatScore(stats.bestScore, def.unit)}
         </Chip>
         <Chip>Promedio 30d: {formatScore(stats.avg30d, def.unit)}</Chip>
         {stats.currentRank != null && (
@@ -190,8 +191,8 @@ function StatsDetail({ stats, slug }: { stats: BenchmarkStats; slug: string }) {
         )}
       </div>
       {improved && (
-        <p className="mt-2 font-black text-emerald-500">
-          ¡Mejoraste {stats.improvement30dPct}% este mes! 🎉
+        <p className="mt-2 font-display font-bold text-emerald-600">
+          ¡Mejoraste {stats.improvement30dPct}% este mes!
         </p>
       )}
       <div className="mt-3 h-56">

@@ -1,13 +1,14 @@
 import type { Metadata, Viewport } from "next";
-import { Bricolage_Grotesque, Figtree } from "next/font/google";
+import { Fraunces, Figtree } from "next/font/google";
 import { Providers } from "@/components/providers";
 import "./globals.css";
 
-/** Display con carácter para titulares; cuerpo cálido y legible. */
-const bricolage = Bricolage_Grotesque({
+/** Serif editorial con alma para titulares; cuerpo cálido y legible. */
+const fraunces = Fraunces({
   subsets: ["latin"],
-  variable: "--font-bricolage",
-  weight: ["400", "600", "700", "800"],
+  variable: "--font-fraunces",
+  weight: ["400", "500", "600", "700", "900"],
+  style: ["normal", "italic"],
 });
 const figtree = Figtree({
   subsets: ["latin"],
@@ -30,7 +31,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es" className={`${bricolage.variable} ${figtree.variable}`}>
+    <html lang="es" className={`${fraunces.variable} ${figtree.variable}`}>
       <body>
         <Providers>{children}</Providers>
       </body>

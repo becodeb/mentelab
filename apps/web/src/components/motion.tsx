@@ -5,12 +5,12 @@ import type { ReactNode } from "react";
 
 /** Coreografía compartida: entradas suaves con resorte, en cascada. */
 
+// Solo transform+opacity: GPU-friendly, cero lag en tablets escolares.
 export const springUp: Variants = {
-  hidden: { opacity: 0, y: 28, filter: "blur(6px)" },
+  hidden: { opacity: 0, y: 28 },
   show: {
     opacity: 1,
     y: 0,
-    filter: "blur(0px)",
     transition: { type: "spring", stiffness: 190, damping: 22 },
   },
 };

@@ -3,7 +3,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { WORD_POOL, type VerbalMemoryConfig } from "@mentelab/benchmarks";
 import type { GameProps } from "../shell/types";
-import { Button } from "@/components/ui";
+import { sfx } from "@/lib/sfx";
+import { HeartIcon } from "@/components/icons";
 
 export function VerbalMemoryGame({ config, emit, now, finish }: GameProps) {
   const cfg = config as VerbalMemoryConfig;
@@ -50,9 +51,11 @@ export function VerbalMemoryGame({ config, emit, now, finish }: GameProps) {
     });
     seenRef.current.add(word);
     if (correct) {
+      sfx.success();
       setScore((s) => s + 1);
       nextWord();
     } else {
+      sfx.error();
       emit("life_lost", { livesLeft: lives - 1 });
       if (lives - 1 <= 0) {
         finishingRef.current = true;
@@ -65,19 +68,33 @@ export function VerbalMemoryGame({ config, emit, now, finish }: GameProps) {
   };
 
   return (
-    <div className="flex min-h-dvh select-none flex-col items-center justify-center bg-gradient-to-b from-blue-50 to-cream-50 p-6">
-      <div className="flex gap-6 text-sm font-black uppercase tracking-widest text-blue-300">
-        <span>✅ {score}</span>
-        <span>{"❤️".repeat(Math.max(0, lives))}</span>
+    <div className="flex min-h-dvh select-none flex-col items-center justify-center bg-cream-50 p-6">
+      <div className="flex items-center gap-8 font-display text-sm font-bold uppercase tracking-[0.25em] text-ink-400">
+        <span className="text-ink-700">{score} aciertos</span>
+        <span className="flex gap-1.5">
+          {Array.from({ length: cfg.lives }, (_, i) => (
+            <HeartIcon
+              key={i}
+              filled={i < lives}
+              className={`h-5 w-5 ${i < lives ? "text-rose-500" : "text-cream-300"}`}
+            />
+          ))}
+        </span>
       </div>
-      <p className="mt-10 text-5xl font-black text-slate-800">{word}</p>
-      <div className="mt-12 flex gap-4">
-        <Button size="xl" variant="success" onClick={() => answer("seen")}>
-          👁️ LA VI
-        </Button>
-        <Button size="xl" onClick={() => answer("new")}>
-          ✨ NUEVA
-        </Button>
+      <p className="mt-12 font-display text-7xl font-black tracking-tight text-ink-900">{word}</p>
+      <div className="mt-14 grid w-full max-w-md grid-cols-2 gap-4">
+        <button
+          onPointerDown={() => answer("seen")}
+          className="rounded-[1.5rem] bg-ink-900 py-6 font-display text-2xl font-bold text-cream-50 shadow-[0_10px_28px_-10px_rgba(32,27,18,0.55)] transition-all hover:-translate-y-1 active:scale-95"
+        >
+          La vi
+        </button>
+        <button
+          onPointerDown={() => answer("new")}
+          className="rounded-[1.5rem] border-2 border-ink-900/15 bg-[#fffdf6] py-6 font-display text-2xl font-bold text-ink-900 transition-all hover:-translate-y-1 hover:border-ink-900 active:scale-95"
+        >
+          Es nueva
+        </button>
       </div>
     </div>
   );

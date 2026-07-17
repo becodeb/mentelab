@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { ChimpTestConfig } from "@mentelab/benchmarks";
 import type { GameProps } from "../shell/types";
+import { sfx } from "@/lib/sfx";
 
 interface Tile {
   n: number;
@@ -60,6 +61,7 @@ export function ChimpTestGame({ config, emit, now, finish }: GameProps) {
     const correct = tile.n === nextN;
     emit("tile_click", { level: count, ordinal: tile.n, correct, latencyMs });
     if (!correct) {
+      sfx.error();
       emit("strike", { level: count });
       const s = strikes + 1;
       setStrikes(s);
@@ -73,21 +75,27 @@ export function ChimpTestGame({ config, emit, now, finish }: GameProps) {
     }
     if (tile.n === 1) setHidden(true); // el 1 tapa el resto: hay que recordar
     if (tile.n === count) {
+      sfx.success();
       emit("board_complete", { count });
       setTimeout(() => setCount((c) => c + 1), 600);
     } else {
+      sfx.note(tile.n);
       setNextN(tile.n + 1);
     }
     setTiles((ts) => ts.filter((t) => t.n !== tile.n));
   };
 
   return (
-    <div className="flex min-h-dvh select-none flex-col items-center justify-center bg-gradient-to-b from-blue-50 to-cream-50 p-4">
-      <div className="flex gap-6 text-sm font-black uppercase tracking-widest text-blue-300">
-        <span>{count} números</span>
-        <span>
-          {"❌".repeat(strikes)}
-          {"⚪".repeat(Math.max(0, cfg.strikesAllowed - strikes))}
+    <div className="flex min-h-dvh select-none flex-col items-center justify-center bg-cream-50 p-4">
+      <div className="flex items-center gap-8 font-display text-sm font-bold uppercase tracking-[0.25em] text-ink-400">
+        <span className="text-ink-700">{count} números</span>
+        <span className="flex gap-1.5" aria-label={`${cfg.strikesAllowed - strikes} intentos restantes`}>
+          {Array.from({ length: cfg.strikesAllowed }, (_, i) => (
+            <span
+              key={i}
+              className={`h-3 w-3 rounded-full ${i < strikes ? "bg-rose-500" : "bg-cream-300"}`}
+            />
+          ))}
         </span>
       </div>
       <div
@@ -102,7 +110,11 @@ export function ChimpTestGame({ config, emit, now, finish }: GameProps) {
             <button
               key={i}
               onPointerDown={() => clickTile(tile)}
-              className="flex aspect-square items-center justify-center rounded-xl bg-blue-500 text-2xl font-black text-white shadow-md transition-transform active:scale-90"
+              className={`flex aspect-square items-center justify-center rounded-xl font-display text-2xl font-bold transition-transform active:scale-90 ${
+                hidden && tile.n !== 1
+                  ? "bg-ink-900 shadow-[0_5px_14px_-5px_rgba(32,27,18,0.5)]"
+                  : "bg-[#fffdf6] border-2 border-ink-900/15 text-ink-900 shadow-[0_5px_14px_-6px_rgba(32,27,18,0.3)]"
+              }`}
             >
               {hidden && tile.n !== 1 ? "" : tile.n}
             </button>
@@ -111,8 +123,8 @@ export function ChimpTestGame({ config, emit, now, finish }: GameProps) {
           );
         })}
       </div>
-      <p className="mt-4 font-bold text-blue-400">
-        {hidden ? "¡De memoria! Seguí en orden" : "Empezá por el 1"}
+      <p className="mt-4 font-display text-lg font-semibold text-ink-500">
+        {hidden ? "De memoria: seguí en orden" : "Empezá por el 1"}
       </p>
     </div>
   );

@@ -7,6 +7,10 @@ import { verbalMemory } from "./benchmarks/verbal-memory";
 import { chimpTest } from "./benchmarks/chimp-test";
 import { visualMemory } from "./benchmarks/visual-memory";
 import { typingTest } from "./benchmarks/typing-test";
+import { oddOneOut } from "./benchmarks/odd-one-out";
+import { colorTrap } from "./benchmarks/color-trap";
+import { quickMath } from "./benchmarks/quick-math";
+import { memoryPairs } from "./benchmarks/memory-pairs";
 
 /**
  * Registro central de benchmarks. Para agregar uno nuevo:
@@ -24,6 +28,11 @@ const ALL: BenchmarkDefinition<unknown, unknown>[] = [
   chimpTest,
   visualMemory,
   typingTest,
+  // Originales de MenteLab (no existen en Human Benchmark):
+  oddOneOut,
+  colorTrap,
+  quickMath,
+  memoryPairs,
 ] as BenchmarkDefinition<unknown, unknown>[];
 
 export const benchmarkRegistry: ReadonlyMap<string, BenchmarkDefinition<unknown, unknown>> =

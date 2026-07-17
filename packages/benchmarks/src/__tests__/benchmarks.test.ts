@@ -5,7 +5,7 @@ import { typingTest } from "../benchmarks/typing-test";
 import type { AttemptEvent } from "@mentelab/shared";
 
 describe("registry", () => {
-  it("tiene los 8 benchmarks del diseño", () => {
+  it("tiene los 8 benchmarks del diseño + los 4 originales", () => {
     expect(BENCHMARK_SLUGS).toEqual([
       "reaction-time",
       "sequence-memory",
@@ -15,6 +15,10 @@ describe("registry", () => {
       "chimp-test",
       "visual-memory",
       "typing-test",
+      "odd-one-out",
+      "color-trap",
+      "quick-math",
+      "memory-pairs",
     ]);
   });
 
@@ -47,7 +51,7 @@ describe("registry", () => {
 
   it("el catálogo serializa sin funciones", () => {
     const cat = serializeCatalog();
-    expect(cat).toHaveLength(8);
+    expect(cat).toHaveLength(12);
     expect(JSON.parse(JSON.stringify(cat))).toEqual(cat);
   });
 });

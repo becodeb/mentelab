@@ -33,4 +33,16 @@ export const gameComponents: Record<string, GameComponent> = {
   "typing-test": dynamic(() =>
     import("./games/TypingTestGame").then((m) => m.TypingTestGame),
   ) as GameComponent,
+  "odd-one-out": dynamic(() =>
+    import("./games/OddOneOutGame").then((m) => m.OddOneOutGame),
+  ) as GameComponent,
+  "color-trap": dynamic(() =>
+    import("./games/ColorTrapGame").then((m) => m.ColorTrapGame),
+  ) as GameComponent,
+  "quick-math": dynamic(() =>
+    import("./games/QuickMathGame").then((m) => m.QuickMathGame),
+  ) as GameComponent,
+  "memory-pairs": dynamic(() =>
+    import("./games/MemoryPairsGame").then((m) => m.MemoryPairsGame),
+  ) as GameComponent,
 };

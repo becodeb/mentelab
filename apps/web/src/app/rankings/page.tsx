@@ -4,11 +4,12 @@ import { useState } from "react";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { serializeCatalog } from "@mentelab/benchmarks";
-import { avatarEmoji, type LeaderboardResponse, type Principal } from "@mentelab/shared";
+import type { LeaderboardResponse, Principal } from "@mentelab/shared";
 import { api } from "@/lib/api";
 import { formatScore } from "@/lib/utils";
 import { useEnsurePlayer } from "@/features/player/hooks";
 import { Card, Spinner, EmptyState } from "@/components/ui";
+import { Monogram } from "@/components/icons";
 
 const PERIODS = [
   { key: "today", label: "Hoy" },
@@ -18,10 +19,10 @@ const PERIODS = [
 ] as const;
 
 const METRICS = [
-  { key: "best", label: "Mejor marca", emoji: "🏆" },
-  { key: "count", label: "Más partidas", emoji: "💪" },
-  { key: "progress", label: "Más mejoró", emoji: "🚀" },
-  { key: "consistency", label: "Más constante", emoji: "📈" },
+  { key: "best", label: "Mejor marca" },
+  { key: "count", label: "Más partidas" },
+  { key: "progress", label: "Más mejoró" },
+  { key: "consistency", label: "Más constante" },
 ] as const;
 
 /**
@@ -53,8 +54,8 @@ export default function RankingsPage() {
     <main className="kid-zone min-h-dvh bg-slate-50 pb-16">
       <div className="mx-auto max-w-2xl space-y-4 px-4 pt-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-black text-slate-800">
-            {isStudent ? "🏆 Ranking de tu curso" : "🌍 Ranking mundial (Modo Libre)"}
+          <h1 className="text-3xl font-semibold text-slate-800">
+            {isStudent ? "Ranking de tu curso" : "Ranking mundial"}
           </h1>
           <Link href="/play" className="font-black text-brand-600">
             Jugar →
@@ -83,7 +84,7 @@ export default function RankingsPage() {
                   metric === m.key ? "bg-brand-600 text-white" : "bg-slate-100 text-slate-500"
                 }`}
               >
-                {m.emoji} {m.label}
+                {m.label}
               </button>
             ))}
           </div>
@@ -107,7 +108,7 @@ export default function RankingsPage() {
           {board.isLoading && <Spinner />}
           {board.data && board.data.entries.length === 0 && (
             <EmptyState
-              emoji="🎮"
+              emoji="✦"
               title="Todavía no hay resultados acá"
               hint="¡Sé el primero en jugar!"
             />
@@ -117,8 +118,8 @@ export default function RankingsPage() {
           )}
         </Card>
         {metric === "progress" && (
-          <p className="text-center text-sm font-bold text-slate-400">
-            🚀 Acá gana el que MÁS MEJORÓ — no hace falta ser el más rápido.
+          <p className="text-center font-display text-sm font-semibold italic text-slate-400">
+            Acá gana el que más mejoró — no hace falta ser el más rápido.
           </p>
         )}
       </div>
@@ -134,7 +135,14 @@ function Leaderboard({
   principal: Principal | null;
 }) {
   void principal;
-  const medal = (rank: number) => (rank === 1 ? "🥇" : rank === 2 ? "🥈" : rank === 3 ? "🥉" : `${rank}º`);
+  const medalClass = (rank: number) =>
+    rank === 1
+      ? "bg-amber-400 text-ink-900"
+      : rank === 2
+        ? "bg-cream-300 text-ink-700"
+        : rank === 3
+          ? "bg-brand-300 text-ink-900"
+          : "bg-cream-100 text-slate-500";
   return (
     <div>
       <div className="space-y-1">
@@ -148,13 +156,17 @@ function Leaderboard({
                   e.isMe ? "bg-brand-50 ring-2 ring-brand-300" : "bg-slate-50"
                 }`}
               >
-                <span className="w-9 text-lg font-black text-slate-500">{medal(e.rank)}</span>
-                <span className="text-2xl">{avatarEmoji(e.avatarId)}</span>
+                <span
+                  className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full font-display text-sm font-bold ${medalClass(e.rank)}`}
+                >
+                  {e.rank}º
+                </span>
+                <Monogram name={e.displayName} seed={e.playerId} className="h-9 w-9 text-base" />
                 <span className="flex-1 truncate font-bold text-slate-700">
                   {e.displayName}
                   {e.isMe && " (vos)"}
                 </span>
-                <span className="font-black text-slate-600">
+                <span className="font-display font-bold text-slate-600">
                   {formatScore(e.value, data.unit)}
                 </span>
               </div>

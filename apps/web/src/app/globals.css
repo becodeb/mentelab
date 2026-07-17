@@ -8,7 +8,7 @@
    la app herede la nueva piel sin tocar cada componente.
    ═══════════════════════════════════════════════════════════════════ */
 @theme {
-  --font-display: var(--font-bricolage), ui-rounded, system-ui, sans-serif;
+  --font-display: var(--font-fraunces), Georgia, serif;
   --font-body: var(--font-figtree), system-ui, sans-serif;
 
   /* ── Crema (superficie) y Tinta (texto) ── */
@@ -139,7 +139,7 @@ body {
 /* Titulares siempre en la display face — toda la app hereda el carácter */
 h1, h2, h3, .font-display {
   font-family: var(--font-display);
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
 }
 
 ::selection {
@@ -158,10 +158,14 @@ body::after {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
-/* Targets táctiles grandes en la zona alumno */
-.kid-zone button,
-.kid-zone a {
-  min-height: 48px;
+/* Targets táctiles grandes en la zona alumno.
+   IMPORTANTE: dentro de @layer base para que las utilities de los juegos
+   (min-h-dvh en botones fullscreen) SIEMPRE ganen — sin esto, esta regla
+   sin capa pisaba el alto de pantalla completa del Reaction Time. */
+@layer base {
+  .kid-zone :where(button, a) {
+    min-height: 48px;
+  }
 }
 
 /* Cinta marquee (landing) */

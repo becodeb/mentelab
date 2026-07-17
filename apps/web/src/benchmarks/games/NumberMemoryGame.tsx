@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { NumberMemoryConfig } from "@mentelab/benchmarks";
 import type { GameProps } from "../shell/types";
+import { sfx } from "@/lib/sfx";
 import { Button, Input, ProgressBar } from "@/components/ui";
 
 type Phase = "showing" | "input" | "reveal";
@@ -57,6 +58,8 @@ export function NumberMemoryGame({ config, emit, now, finish }: GameProps) {
       memorizeMs: Math.round(inputStartRef.current - shownAtRef.current),
       typeMs: Math.round(now() - inputStartRef.current),
     });
+    if (correct) sfx.success();
+    else sfx.error();
     setLastCorrect(correct);
     setPhase("reveal");
     setTimeout(() => {
@@ -66,15 +69,17 @@ export function NumberMemoryGame({ config, emit, now, finish }: GameProps) {
   };
 
   return (
-    <div className="flex min-h-dvh select-none flex-col items-center justify-center bg-gradient-to-b from-blue-50 to-cream-50 p-6">
-      <p className="text-sm font-black uppercase tracking-widest text-blue-300">
+    <div className="flex min-h-dvh select-none flex-col items-center justify-center bg-cream-50 p-6">
+      <p className="font-display text-sm font-bold uppercase tracking-[0.25em] text-ink-400">
         {digits} dígito{digits > 1 ? "s" : ""}
       </p>
       {phase === "showing" && (
         <>
-          <p className="mt-6 text-6xl font-black tracking-[0.3em] text-slate-800">{shown}</p>
-          <ProgressBar value={100 - progress} max={100} className="mt-8 w-64" barClassName="bg-blue-500" />
-          <p className="mt-2 font-bold text-blue-400">¡Memorizalo!</p>
+          <p className="mt-6 font-display text-7xl font-black tracking-[0.25em] text-ink-900">
+            {shown}
+          </p>
+          <ProgressBar value={100 - progress} max={100} className="mt-8 w-64" barClassName="bg-ink-900" />
+          <p className="mt-2 font-display text-lg font-semibold text-ink-500">Memorizalo…</p>
         </>
       )}
       {phase === "input" && (
@@ -95,15 +100,17 @@ export function NumberMemoryGame({ config, emit, now, finish }: GameProps) {
       )}
       {phase === "reveal" && (
         <div className="mt-6 text-center">
-          <p className="text-6xl">{lastCorrect ? "🎉" : "🤏"}</p>
-          <p className="mt-2 text-2xl font-black text-slate-700">
+          <p
+            className={`font-display text-5xl font-black ${lastCorrect ? "text-emerald-600" : "text-brand-600"}`}
+          >
             {lastCorrect ? "¡Correcto!" : "¡Casi!"}
           </p>
-          <p className="mt-1 font-bold text-slate-500">
-            Era <span className="tracking-widest text-slate-800">{shown}</span>
+          <p className="mt-3 text-lg font-semibold text-ink-500">
+            Era <span className="font-display font-bold tracking-widest text-ink-900">{shown}</span>
             {!lastCorrect && (
               <>
-                {" — "}escribiste <span className="tracking-widest">{answer}</span>
+                {" — "}escribiste{" "}
+                <span className="font-display font-bold tracking-widest text-rose-600">{answer}</span>
               </>
             )}
           </p>

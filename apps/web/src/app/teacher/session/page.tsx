@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { QRCodeSVG } from "qrcode.react";
-import { avatarEmoji } from "@mentelab/shared";
+import { Monogram } from "@/components/icons";
 import { api } from "@/lib/api";
 import { useClassrooms } from "@/features/staff/hooks";
 import { Button, Card, Spinner } from "@/components/ui";
@@ -85,7 +85,7 @@ export default function ClassSessionPage() {
                   key={p.displayName}
                   className="flex items-center gap-3 rounded-xl bg-slate-50 px-3 py-2"
                 >
-                  <span className="text-2xl">{avatarEmoji(p.avatarId)}</span>
+                  <Monogram name={p.displayName} className="h-8 w-8 text-sm" />
                   <span className="flex-1 font-bold text-slate-700">{p.displayName}</span>
                   <span className="text-sm font-black text-brand-600">{p.attempts} partidas</span>
                 </div>

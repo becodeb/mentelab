@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { AimTrainerConfig } from "@mentelab/benchmarks";
 import type { GameProps } from "../shell/types";
+import { sfx } from "@/lib/sfx";
 
 interface Target {
   i: number;
@@ -46,6 +47,7 @@ export function AimTrainerGame({ config, emit, now, finish }: GameProps) {
     const cy = rect.top + rect.height / 2;
     const distPx = Math.round(Math.hypot(e.clientX - cx, e.clientY - cy));
     emit("target_hit", { i: target.i, ms: now() - shownAtRef.current, distPx });
+    sfx.note(target.i);
     const done = target.i >= cfg.targets;
     setHits(target.i);
     setTarget(null);
@@ -57,23 +59,26 @@ export function AimTrainerGame({ config, emit, now, finish }: GameProps) {
   };
 
   const handleMiss = () => {
-    if (target) emit("target_miss", { i: target.i });
+    if (target) {
+      sfx.error();
+      emit("target_miss", { i: target.i });
+    }
   };
 
   return (
     <div
       ref={areaRef}
       onPointerDown={handleMiss}
-      className="relative min-h-dvh w-full select-none overflow-hidden bg-gradient-to-b from-pink-50 to-cream-50"
+      className="relative min-h-dvh w-full select-none overflow-hidden bg-cream-50"
     >
-      <p className="pointer-events-none absolute left-1/2 top-4 -translate-x-1/2 text-sm font-black uppercase tracking-widest text-pink-300">
-        {hits}/{cfg.targets} blancos
+      <p className="pointer-events-none absolute left-1/2 top-5 -translate-x-1/2 font-display text-sm font-bold uppercase tracking-[0.25em] text-ink-400">
+        {hits} de {cfg.targets} blancos
       </p>
       {target && (
         <button
           onPointerDown={handleHit}
           aria-label="blanco"
-          className="absolute flex items-center justify-center rounded-full bg-pink-500 shadow-lg shadow-pink-500/40 transition-transform active:scale-90"
+          className="absolute flex items-center justify-center rounded-full bg-brand-600 shadow-[0_10px_28px_-8px_rgba(198,82,48,0.7)] transition-transform active:scale-90"
           style={{
             left: `${target.xPct}%`,
             top: `${target.yPct}%`,
@@ -82,7 +87,14 @@ export function AimTrainerGame({ config, emit, now, finish }: GameProps) {
             transform: "translate(-50%, -50%)",
           }}
         >
-          <span className="rounded-full bg-[#fffdf6]" style={{ width: cfg.targetSizePx * 0.4, height: cfg.targetSizePx * 0.4 }} />
+          <span
+            className="rounded-full border-4 border-cream-50/70"
+            style={{ width: cfg.targetSizePx * 0.62, height: cfg.targetSizePx * 0.62 }}
+          />
+          <span
+            className="absolute rounded-full bg-cream-50"
+            style={{ width: cfg.targetSizePx * 0.22, height: cfg.targetSizePx * 0.22 }}
+          />
         </button>
       )}
     </div>

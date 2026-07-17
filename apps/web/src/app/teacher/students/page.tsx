@@ -2,7 +2,8 @@
 
 import { useRef, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { avatarEmoji, type StudentCredential, type StudentRow } from "@mentelab/shared";
+import type { StudentCredential, StudentRow } from "@mentelab/shared";
+import { Monogram } from "@/components/icons";
 import { api } from "@/lib/api";
 import { relativeDay } from "@/lib/utils";
 import { useClassrooms, useStudents } from "@/features/staff/hooks";
@@ -149,7 +150,11 @@ function StudentsTable({
               className={`border-b border-slate-50 ${!s.active ? "opacity-40" : ""}`}
             >
               <td className="py-2 pr-3 font-bold text-slate-700">
-                <span className="mr-2 text-xl">{avatarEmoji(s.avatarId)}</span>
+                <Monogram
+                  name={s.firstName}
+                  seed={s.playerId}
+                  className="mr-2 h-7 w-7 text-sm align-middle"
+                />
                 {s.lastName}, {s.firstName}
                 {!s.active && " (inactivo)"}
               </td>

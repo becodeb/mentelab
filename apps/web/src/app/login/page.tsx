@@ -3,10 +3,11 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { avatarEmoji, PICTURE_KEYS, type ClassRosterEntry } from "@mentelab/shared";
+import { PICTURE_KEYS, type ClassRosterEntry } from "@mentelab/shared";
 import { useClassLookup, useStudentLogin } from "@/features/auth/hooks";
 import { REMEMBERED_CLASS_KEY, storage } from "@/lib/device";
 import { Button, Card, Input, Spinner } from "@/components/ui";
+import { BrainMark, Monogram } from "@/components/icons";
 
 /**
  * Login alumno en capas (doc 04 §1):
@@ -46,8 +47,8 @@ export default function StudentLoginPage() {
     return (
       <main className="kid-zone flex min-h-dvh items-center justify-center bg-gradient-to-b from-brand-50 to-cream-50 p-6">
         <Card className="w-full max-w-md text-center">
-          <p className="text-6xl">🏫</p>
-          <h1 className="mt-2 text-2xl font-black text-slate-800">¿Cuál es tu clase?</h1>
+          <BrainMark className="mx-auto h-14 w-14 text-brand-600" />
+          <h1 className="mt-3 text-3xl font-semibold text-slate-800">¿Cuál es tu clase?</h1>
           <p className="mt-1 text-slate-500 font-semibold">
             Escaneá el QR que muestra tu docente, o escribí el código:
           </p>
@@ -73,7 +74,7 @@ export default function StudentLoginPage() {
             className="mt-6 text-sm font-bold text-slate-400 hover:text-brand-600"
             onClick={() => router.push("/play")}
           >
-            🎮 Jugar sin cuenta (Modo Libre)
+            Jugar sin cuenta (Modo Libre) →
           </button>
         </Card>
       </main>
@@ -89,8 +90,14 @@ export default function StudentLoginPage() {
     return (
       <main className="kid-zone flex min-h-dvh items-center justify-center bg-gradient-to-b from-brand-50 to-cream-50 p-6">
         <Card className="w-full max-w-md text-center">
-          <p className="text-6xl">{avatarEmoji(selected.avatarId)}</p>
-          <h1 className="mt-2 text-2xl font-black text-slate-800">¡Hola {selected.displayName}!</h1>
+          <Monogram
+            name={selected.displayName}
+            seed={selected.playerId}
+            className="mx-auto h-20 w-20 text-4xl"
+          />
+          <h1 className="mt-3 text-3xl font-semibold text-slate-800">
+            ¡Hola {selected.displayName}!
+          </h1>
           {selected.secretType === "PIN4" ? (
             <PinPad
               onSubmit={handleLogin}
@@ -138,8 +145,8 @@ export default function StudentLoginPage() {
               onClick={() => setSelected(s)}
               className="rounded-3xl border-2 border-slate-100 bg-[#fffdf6] p-4 text-center shadow-sm transition-all hover:border-brand-400 hover:shadow-md active:scale-95"
             >
-              <p className="text-4xl">{avatarEmoji(s.avatarId)}</p>
-              <p className="mt-1 truncate text-sm font-black text-slate-700">{s.displayName}</p>
+              <Monogram name={s.displayName} seed={s.playerId} className="h-12 w-12 text-xl" />
+              <p className="mt-2 truncate text-sm font-black text-slate-700">{s.displayName}</p>
             </motion.button>
           ))}
         </div>

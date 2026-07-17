@@ -8,6 +8,8 @@ import { getBenchmark } from "@mentelab/benchmarks";
 import type { CompleteAttemptResponse } from "@mentelab/shared";
 import { formatScore } from "@/lib/utils";
 import { Button, ProgressBar } from "@/components/ui";
+import { sfx } from "@/lib/sfx";
+import { ChartIcon, CheckIcon, FlameIcon, MissionIcon, TrophyIcon } from "@/components/icons";
 
 /**
  * Pantalla de resultados (doc 04 §2): SIEMPRE abre con lo positivo personal
@@ -28,6 +30,7 @@ export function ResultsScreen({
   useEffect(() => {
     const palette = ["#d96c47", "#e8a33d", "#8cb573", "#7c97d8", "#201b12"];
     if (r.personalRecord || r.levelUp) {
+      sfx.record();
       confetti({ particleCount: 160, spread: 85, origin: { y: 0.55 }, colors: palette });
       setTimeout(
         () => confetti({ particleCount: 60, spread: 120, origin: { y: 0.4 }, colors: palette }),
@@ -70,9 +73,9 @@ export function ResultsScreen({
               initial={{ opacity: 0, y: 12, scale: 0.8 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               transition={{ delay: 0.35, type: "spring", stiffness: 200, damping: 12 }}
-              className="mt-2 font-display text-2xl font-bold text-brand-600"
+              className="mt-2 inline-flex items-center gap-2 font-display text-2xl font-bold text-brand-600"
             >
-              🏆 ¡NUEVO RÉCORD PERSONAL!
+              <TrophyIcon className="h-6 w-6" /> ¡NUEVO RÉCORD PERSONAL!
             </motion.p>
           )}
           <motion.p
@@ -119,8 +122,8 @@ export function ResultsScreen({
             ))}
           </div>
           {r.currentStreak > 1 && (
-            <p className="mt-3 font-display font-bold text-brand-600">
-              🔥 {r.currentStreak} días seguidos
+            <p className="mt-3 inline-flex items-center gap-1.5 font-display font-bold text-brand-600">
+              <FlameIcon className="h-5 w-5" /> {r.currentStreak} días seguidos
             </p>
           )}
         </motion.div>
@@ -161,8 +164,13 @@ export function ResultsScreen({
                 key={m.code}
                 className="flex items-center justify-between rounded-2xl bg-cream-100 px-4 py-2.5"
               >
-                <p className="text-sm font-bold text-ink-700">
-                  {m.completed ? "✅" : "📋"} {m.title}
+                <p className="inline-flex items-center gap-2 text-sm font-bold text-ink-700">
+                  {m.completed ? (
+                    <CheckIcon className="h-4 w-4 text-emerald-600" />
+                  ) : (
+                    <MissionIcon className="h-4 w-4 text-ink-400" />
+                  )}
+                  {m.title}
                 </p>
                 <p className="font-display text-sm font-bold text-ink-500">
                   {m.progress}/{m.target}
@@ -191,16 +199,16 @@ export function ResultsScreen({
           className="mt-7 flex justify-center gap-3"
         >
           <Button size="lg" onClick={onPlayAgain}>
-            🔁 Otra vez
+            Otra vez
           </Button>
           <Link href="/play">
             <Button size="lg" variant="secondary">
-              🏠 Juegos
+              Juegos
             </Button>
           </Link>
-          <Link href="/me">
+          <Link href="/me" aria-label="Mi progreso">
             <Button size="lg" variant="ghost">
-              📊
+              <ChartIcon className="h-5 w-5" />
             </Button>
           </Link>
         </motion.div>
