@@ -59,4 +59,5 @@ COPY --from=builder /app/packages ./packages
 USER api
 EXPOSE 4000
 
-CMD ["pnpm", "--filter", "@mentelab/api", "start"]
+# Run migrations then start the API
+CMD ["sh", "-c", "pnpm --filter @mentelab/db migrate:deploy && pnpm --filter @mentelab/api start"]
