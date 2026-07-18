@@ -1,5 +1,5 @@
 # ---- Base: pnpm ----
-FROM node:20-slim AS base
+FROM node:22-slim AS base
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable && corepack prepare pnpm@11.13.0 --activate
@@ -29,7 +29,7 @@ ENV NEXT_TELEMETRY_DISABLED=1
 RUN pnpm --filter @mentelab/web build
 
 # ---- Runner ----
-FROM node:20-slim AS runner
+FROM node:22-slim AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
