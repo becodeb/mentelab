@@ -60,9 +60,9 @@ COPY --from=builder /app/packages ./packages
 RUN echo '#!/bin/sh' > /entrypoint.sh && \
     echo 'set -e' >> /entrypoint.sh && \
     echo 'echo "=== Generating Prisma client ==="' >> /entrypoint.sh && \
-    echo 'pnpm --filter @mentelab/db exec prisma generate' >> /entrypoint.sh && \
+    echo 'cd /app/packages/db && node /app/node_modules/.pnpm/prisma@6.19.3_typescript@5.9.3/node_modules/prisma/build/index.js generate' >> /entrypoint.sh && \
     echo 'echo "=== Running Prisma migrations ==="' >> /entrypoint.sh && \
-    echo 'pnpm --filter @mentelab/db exec prisma migrate deploy' >> /entrypoint.sh && \
+    echo 'node /app/node_modules/.pnpm/prisma@6.19.3_typescript@5.9.3/node_modules/prisma/build/index.js migrate deploy' >> /entrypoint.sh && \
     echo 'echo "=== Starting API ==="' >> /entrypoint.sh && \
     echo 'exec pnpm --filter @mentelab/api start' >> /entrypoint.sh && \
     chmod +x /entrypoint.sh
