@@ -67,6 +67,10 @@ RUN echo '#!/bin/sh' > /entrypoint.sh && \
     echo 'exec pnpm --filter @mentelab/api start' >> /entrypoint.sh && \
     chmod +x /entrypoint.sh
 
+# Fix ownership for the api user (only what pnpm needs to write)
+RUN chown -R api:nodejs /pnpm && \
+    chown api:nodejs /entrypoint.sh
+
 USER api
 EXPOSE 4000
 
