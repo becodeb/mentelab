@@ -27,9 +27,7 @@ RUN pnpm install --frozen-lockfile
 # ---- Builder ----
 FROM deps AS builder
 COPY . .
-
-# Generate Prisma client if needed by shared packages
-RUN pnpm --filter @mentelab/db generate 2>/dev/null || true
+# Prisma client is not needed for web build — skip generate
 
 # Accept build-time env vars from Coolify (Next.js inlines NEXT_PUBLIC_* at build)
 ARG NEXT_PUBLIC_API_URL
