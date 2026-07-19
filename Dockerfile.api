@@ -56,13 +56,13 @@ COPY --from=builder /app/package.json /app/pnpm-lock.yaml /app/pnpm-workspace.ya
 COPY --from=builder /app/apps/api ./apps/api
 COPY --from=builder /app/packages ./packages
 
-# Entrypoint script: generate client, migrate, then start
+# Entrypoint script: generate client, migrate, then start (use npx to avoid pnpm workspace re-resolution)
 RUN echo '#!/bin/sh' > /entrypoint.sh && \
     echo 'set -e' >> /entrypoint.sh && \
     echo 'echo "=== Generating Prisma client ==="' >> /entrypoint.sh && \
-    echo 'pnpm --filter @mentelab/db generate' >> /entrypoint.sh && \
+    echo 'npx prisma generate --schema=packages/db/prisma/schema.prisma' >> /entrypoint.sh && \
     echo 'echo "=== Running Prisma migrations ==="' >> /entrypoint.sh && \
-    echo 'pnpm --filter @mentelab/db migrate:deploy' >> /entrypoint.sh && \
+    echo 'npx prisma migrate deploy --schema=packages/db/prisma/schema.prisma' >> /entrypoint.sh && \
     echo 'echo "=== Starting API ==="' >> /entrypoint.sh && \
     echo 'exec pnpm --filter @mentelab/api start' >> /entrypoint.sh && \
     chmod +x /entrypoint.sh
